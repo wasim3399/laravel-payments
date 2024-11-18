@@ -108,7 +108,7 @@ class TransactionController extends Controller
                 $amount = $responseData['amount'] ?? null;
 
                 if ($id && $amount) {
-                    // Capture the payment
+                    // Capture the payment of IG
                     return $this->intergiro->capturePayment($id, $amount);
                 }
             }
