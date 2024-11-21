@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Library\Intergiro;
+use App\Library\Rendix;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -10,6 +11,7 @@ use Illuminate\Support\Str;
 class TransactionController extends Controller
 {
     protected $intergiro;
+    protected $rendix;
 
     /**
      * Constructor to inject the Intergiro service.
@@ -17,6 +19,7 @@ class TransactionController extends Controller
     public function __construct()
     {
         $this->intergiro = new Intergiro();
+        $this->rendix = new Rendix();
     }
 
     /**
@@ -75,19 +78,29 @@ class TransactionController extends Controller
      */
     public function makePayment(Request $request)
     {
-        $payload = [
-            'amount'   => 2,
-            'number'   => Str::random(20),
-            'currency' => 'EUR',
-            'card'     => [
-                'pan'     => $request['card-number'], // 4111111111111111
-                'expires' => [2, 25],
-                'csc'     => $request['cvv'],
-            ],
-            'target' => url('/callback/getIgCallback'),
-        ];
+        if($request->name == 'rendix')
+        {
+            $rendixToken = $this->rendix->getToken();
+            $responseData = json_decode($rendixToken, true);
+            if (isset($responseData['success']) && $responseData['data']['token'])
+            {
+                $tranx = $this->rendix->createTranx($responseData['data']['token']);
+                $response = json_decode($tranx, true);
 
-        return $this->intergiro->makeIgRequest($payload);
+                if (isset($response['success']) && $response['data']['saleId'])
+                {
+                    return view('payments.qr', ['qrCode' => $response['data']['qrCodeBase64']]);
+                }
+
+            } else {
+                // Redirect to a failure or pending view
+                return view('payments.failure', ['data' => $responseData]);
+            }
+
+        }
+
+        // default route to IG
+        return $this->intergiro->makeIgRequest($request);
     }
 
     /**

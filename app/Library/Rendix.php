@@ -4,10 +4,8 @@ namespace App\Library;
 
 use App\Helpers\GuzzleHelper;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 
-class Intergiro
+class Rendix
 {
     protected $guzzleHelper;
 
@@ -17,7 +15,7 @@ class Intergiro
     public function __construct()
     {
         $this->guzzleHelper = new GuzzleHelper([
-            'base_uri' => Config::get('constants.INTERGIRO_BASE_URL'),
+            'base_uri' => Config::get('constants.RENDIX_BASE_URL'),
         ]);
     }
 
@@ -27,26 +25,19 @@ class Intergiro
      * @param array $payload
      * @return string
      */
-    public function makeIgRequest(Request $request): string
+    public function getToken(): string
     {
         $payload = [
-            'amount'   => 2,
-            'number'   => Str::random(20),
-            'currency' => 'EUR',
-            'card'     => [
-                'pan'     => $request['card-number'], // 4111111111111111
-                'expires' => [2, 25],
-                'csc'     => $request['cvv'],
-            ],
-            'target' => url('/callback/getIgCallback'),
+            'email'   => Config::get('constants.EMAIL'),
+            'password'   => Config::get('constants.PASS'),
+            'merchantId' => Config::get('constants.MERCHANT_ID')
         ];
 
         $headers = [
             'Content-Type'  => 'application/json',
-            'Authorization' => 'Bearer ' . Config::get('constants.IG_PBK'),
         ];
 
-        return $this->guzzleHelper->sendRequest('POST', '/v1/authorization/redirect', [
+        return $this->guzzleHelper->sendRequest('POST', '/efx/v1/external/login', [
             'headers' => $headers,
             'json'    => $payload,
         ]);
@@ -58,16 +49,25 @@ class Intergiro
      * @param string $token
      * @return string
      */
-    public function verifyToken(string $token): string
+    public function createTranx(string $token): string
     {
         $headers = [
-            'Content-Type'  => 'application/jwt',
-            'Authorization' => 'Bearer ' . Config::get('constants.IG_PBK'),
+            'Content-Type'  => 'application/json',
+            'Authorization' => 'Bearer ' . $token,
         ];
 
-        return $this->guzzleHelper->sendRequest('POST', '/v1/authorization/verify', [
+        $body = [
+            "purchase" => 1,
+            "cpf" => "12979230901",
+            "controlNumber" => "abc123",
+            "phone" => "5512991234567",
+            "email" => "teste@teste.com",
+            "urlWebhook" => "https://webhook.site/cardeye-hpp-callback"
+        ];
+
+        return $this->guzzleHelper->sendRequest('POST', '/efx/v1/external/sell', [
             'headers' => $headers,
-            'body'    => $token,
+            'json'    => $body,
         ]);
     }
 
