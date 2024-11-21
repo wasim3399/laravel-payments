@@ -10,40 +10,40 @@ use Illuminate\Support\Str;
 
 class TransactionController extends Controller
 {
-    protected $intergiro;
-    protected $rendix;
+    protected Intergiro $intergiro;
+    protected Rendix $rendix;
 
     /**
-     * Constructor to inject the Intergiro service.
+     * Constructor to initialize services.
      */
-    public function __construct()
+    public function __construct(Intergiro $intergiro, Rendix $rendix)
     {
-        $this->intergiro = new Intergiro();
-        $this->rendix = new Rendix();
+        $this->intergiro = $intergiro;
+        $this->rendix = $rendix;
     }
 
     /**
-     * Test page for payments.
+     * Render the payment test page.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\View
      */
-    public function test()
+    public function test(): \Illuminate\Contracts\View\View
     {
         return view('payments.test');
     }
 
     /**
-     * Load the main payment page.
+     * Render the main payment page.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\View
      */
-    public function loadPaymentPage()
+    public function loadPaymentPage(): \Illuminate\Contracts\View\View
     {
         return view('payments.main');
     }
 
     /**
-     * Create a transaction and generate a payment URL.
+     * Create a transaction and return the payment URL.
      *
      * @param Request $request
      * @return JsonResponse
@@ -51,55 +51,35 @@ class TransactionController extends Controller
     public function createTransaction(Request $request): JsonResponse
     {
         try {
-            $token = $request->request_reference ?? Str::uuid();
-            $url = url('/') . '/payment/' . $token;
+            $token = $request->input('request_reference', Str::uuid());
+            $paymentUrl = route('payment.show', ['token' => $token]);
 
-            $response = [
+            return response()->json([
                 'success' => true,
                 'message' => 'Transaction created successfully',
-                'data'    => $url,
-            ];
-
-            return response()->json($response, 200);
-        } catch (\Exception $e) {
+                'data' => $paymentUrl,
+            ]);
+        } catch (\Exception $exception) {
             return response()->json([
                 'success' => false,
                 'message' => 'Error creating transaction',
-                'error'   => $e->getMessage(),
+                'error' => $exception->getMessage(),
             ], 500);
         }
     }
 
     /**
-     * Make a payment using the Intergiro API.
+     * Handle the payment process.
      *
      * @param Request $request
-     * @return string
+     * @return \Illuminate\Contracts\View\View|string
      */
     public function makePayment(Request $request)
     {
-        if($request->name == 'rendix')
-        {
-            $rendixToken = $this->rendix->getToken();
-            $responseData = json_decode($rendixToken, true);
-            if (isset($responseData['success']) && $responseData['data']['token'])
-            {
-                $tranx = $this->rendix->createTranx($responseData['data']['token']);
-                $response = json_decode($tranx, true);
-
-                if (isset($response['success']) && $response['data']['saleId'])
-                {
-                    return view('payments.qr', ['qrCode' => $response['data']['qrCodeBase64']]);
-                }
-
-            } else {
-                // Redirect to a failure or pending view
-                return view('payments.failure', ['data' => $responseData]);
-            }
-
+        if ($request->input('name') === 'rendix') {
+            return $this->handleRendixPayment();
         }
 
-        // default route to IG
         return $this->intergiro->makeIgRequest($request);
     }
 
@@ -107,28 +87,49 @@ class TransactionController extends Controller
      * Handle Intergiro callback for payment verification and capture.
      *
      * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|string
+     * @return \Illuminate\Contracts\View\View|string
      */
     public function getIgCallback(Request $request)
     {
         try {
-            // Verify the authorization token
-            if ($request->has('authorization')) {
-                $response = $this->intergiro->verifyToken($request->authorization);
-                $responseData = json_decode($response, true);
-
-                $id = $responseData['id'] ?? null;
-                $amount = $responseData['amount'] ?? null;
-
-                if ($id && $amount) {
-                    // Capture the payment of IG
-                    return $this->intergiro->capturePayment($id, $amount);
-                }
+            if (!$request->has('authorization')) {
+                throw new \InvalidArgumentException('Invalid authorization token.');
             }
 
-            return view('payments.fail', ['error' => 'Invalid authorization token or data.']);
-        } catch (\Exception $e) {
-            return view('payments.fail', ['error' => $e->getMessage()]);
+            $response = $this->intergiro->verifyToken($request->input('authorization'));
+            $responseData = json_decode($response, true);
+
+            if (isset($responseData['id'], $responseData['amount'])) {
+                return $this->intergiro->capturePayment($responseData['id'], $responseData['amount']);
+            }
+
+            throw new \UnexpectedValueException('Missing required data for payment capture.');
+        } catch (\Exception $exception) {
+            return view('payments.fail', ['error' => $exception->getMessage()]);
         }
+    }
+
+    /**
+     * Handle Rendix payment flow.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    private function handleRendixPayment()
+    {
+        $tokenResponse = $this->rendix->getToken();
+        $tokenData = json_decode($tokenResponse, true);
+
+        if (!isset($tokenData['success'], $tokenData['data']['token']) || !$tokenData['success']) {
+            return view('payments.failure', ['data' => $tokenData]);
+        }
+
+        $transactionResponse = $this->rendix->createTranx($tokenData['data']['token']);
+        $transactionData = json_decode($transactionResponse, true);
+
+        if (isset($transactionData['success'], $transactionData['data']['saleId']) && $transactionData['success']) {
+            return view('payments.qr', ['qrCode' => $transactionData['data']['qrCodeBase64']]);
+        }
+
+        return view('payments.failure', ['data' => $transactionData]);
     }
 }

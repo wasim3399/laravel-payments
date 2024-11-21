@@ -22,6 +22,7 @@
             border-radius: 8px;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box; /* Prevent fields from touching the border */
         }
 
         .payment-form h2 {
@@ -46,6 +47,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 16px;
+            box-sizing: border-box; /* Ensures proper spacing within inputs */
         }
 
         .form-group input:focus {
@@ -72,12 +74,47 @@
         .btn-submit:hover {
             background-color: #0056b3;
         }
+
+        /* Loader styling */
+        .loader {
+            display: none;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Overlay styling */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
+<div class="overlay" id="overlay">
+    <div class="loader"></div>
+</div>
+
 <div class="payment-form">
     <h2>Payment Form</h2>
-    <form method="post" action="{{route('makePayment')}}">
+    <form method="post" action="{{route('makePayment')}}" onsubmit="showLoader(event)">
         @csrf
         <div class="form-group">
             <label for="name">Name on Card</label>
@@ -103,5 +140,17 @@
         <button type="submit" class="btn-submit">Submit Payment</button>
     </form>
 </div>
+
+<script>
+    function showLoader(event) {
+        // Prevent double submission
+        event.preventDefault();
+        const overlay = document.getElementById('overlay');
+        overlay.style.display = 'flex';
+
+        // Submit the form after showing the loader
+        event.target.submit();
+    }
+</script>
 </body>
 </html>
