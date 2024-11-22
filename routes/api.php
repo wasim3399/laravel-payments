@@ -10,5 +10,6 @@ Route::get('/user', function (Request $request) {
 
 
 Route::post('/createTransaction', [TransactionController::class, 'createTransaction']);
+Route::get('trust-flow-pay-transaction-status/{id}', [\App\Http\Controllers\Payment\TrustFlowPayController::class, 'checkTransactionStatus']);
 
 

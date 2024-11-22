@@ -170,16 +170,16 @@
                     <div class="dm-row">
                         <div class="dm-input_group"><label for="">APP ID:</label>
                             <input type="text" name="APP_ID" class="dm-input_control"
-                                   value="1213240327171820" autocomplete="off">
+                                   value="{{$app_id}}" autocomplete="off">
                         </div>
                         <div class="dm-input_group"><label for="">TXN ID:</label>
                             <input type="text" id="TXN_ID" name="TXN_ID" class="dm-input_control"
-                                   value="1135241122174622" autocomplete="off"
+                                   value="{{$trx_id}}" autocomplete="off"
                                    placeholder="Enter TXN_ID of transaction">
                         </div>
                         <div class="dm-input_group"><label for="">HASH:</label>
                             <input type="text" id="HASH" name="HASH" class="dm-input_control"
-                                   value="85E0F1DE36B2672D0F7A84725BF5C5B36AA222439254B23E7F033DADF0DE4AA1" autocomplete="off">
+                                   value="{{$hash}}" autocomplete="off">
                         </div>
                     </div>
                 </div>
