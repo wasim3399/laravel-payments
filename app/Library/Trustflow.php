@@ -19,9 +19,13 @@ class Trustflow
         ]);
     }
 
-    public function getHash($order_id)
+    public function getHash($step = false, $order_id)
     {
-        $payloadString = 'AMOUNT=1000~APP_ID=1213240327171820~CARD_EXP_DT=122030~CARD_NUMBER=4111110000000021~CURRENCY_CODE=840~CUST_CITY=Winterfell~CUST_COUNTRY=US~CUST_EMAIL=john_snow@test.com~CUST_NAME=John~CUST_PHONE=9454243567~CUST_SHIP_FIRST_NAME=John~CUST_SHIP_LAST_NAME=Snow~CUST_STATE=The North~CUST_STREET_ADDRESS1=Great Wall~CUST_ZIP=32546~CVV=123~INITIATE_SEAMLESS_TRANSACTION=Y~MERCHANTNAME=Test Merchant~ORDER_ID='.$order_id.'~PAYMENT_TYPE=CC~PRODUCT_DESC=Valerian Streel Blades~RETURN_URL=http://127.0.0.1:8000/test~TXNTYPE=SALEf037897e6fb8427e';
+        if($step)
+        {
+            $payloadString = 'AMOUNT=1000~APP_ID=1213240327171820~CARD_EXP_DT=122030~CARD_NUMBER=4111110000000021~CURRENCY_CODE=840~CUST_CITY=Winterfell~CUST_COUNTRY=US~CUST_EMAIL=john_snow@test.com~CUST_NAME=John~CUST_PHONE=9454243567~CUST_SHIP_FIRST_NAME=John~CUST_SHIP_LAST_NAME=Snow~CUST_STATE=The North~CUST_STREET_ADDRESS1=Great Wall~CUST_ZIP=32546~CVV=123~INITIATE_SEAMLESS_TRANSACTION=Y~MERCHANTNAME=Test Merchant~ORDER_ID='.$order_id.'~PAYMENT_TYPE=CC~PRODUCT_DESC=Valerian Streel Blades~RETURN_URL=http://127.0.0.1:8000/test~TXNTYPE=SALEf037897e6fb8427e';
+        }
+        $payloadString = 'AMOUNT=1000~APP_ID=1213240327171820~CURRENCY_CODE=840~ORDER_ID=ElisrMAI7p059fxK3VOc~TXN_ID=1220241127174227f037897e6fb8427e';
         return strtoupper(hash("sha512", $payloadString));
     }
 
@@ -42,9 +46,9 @@ class Trustflow
         ]);
     }
 
-    public function capturePayment($payload): string
+    public function checkStatus($payload): string
     {
-        return $this->guzzleHelper->sendRequest('POST', '/pgui/services/paymentServices/initiate/payment', [
+        return $this->guzzleHelper->sendRequest('POST', '/pgui/services/paymentServices/transactionStatus', [
             'headers' => [
                 'Accept'=> 'application/json',
                 'Content-Type' => 'application/json',
@@ -52,4 +56,6 @@ class Trustflow
             'json' => $payload,
         ]);
     }
+
+
 }

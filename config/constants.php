@@ -28,8 +28,7 @@ return [
 
     // TRUST FLOW PAY CONSTANTS
     "TRUST_FLOW_PAY_BASE_URL" => "https://sandbox.trustflowpay.com",
-    // "TRUST_FLOW_PAY_REDIRECT_URL" => 'http://127.0.0.1:8000/trust-flow-pay-redirect',
-    "TRUST_FLOW_PAY_REDIRECT_URL" => 'http://127.0.0.1:8000/test',
+    "TRUST_FLOW_PAY_REDIRECT_URL" => 'http://127.0.0.1:8000/trust-flow-pay-redirect',
     "TRUST_FLOW_APP_ID" => "1213240327171820",
     "TRUST_FLOW_SECRET_SALT" => "f037897e6fb8427e",
     "TRUST_FLOW_PAY_SETTLED_CURRENCY" => "USD",

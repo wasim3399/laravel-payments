@@ -191,9 +191,9 @@
     document.autoPost.submit();
 
     var appUrl = "http://127.0.0.1:8000";
-    // setTimeout(chkRendixTranxStatus, 5000);
+    // setTimeout(checkTrustFlowTranxStatus, 5000);
 
-    function chkRendixTranxStatus() {
+    function checkTrustFlowTranxStatus() {
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -210,7 +210,7 @@
                     $(".cl_main_div").empty();
                     $(".cl_main_div").html(data.html);
                 } else {
-                    setTimeout(chkRendixTranxStatus, 5000);
+                    setTimeout(checkTrustFlowTranxStatus, 5000);
                 }
             },
         });

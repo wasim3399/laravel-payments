@@ -164,7 +164,7 @@ class TransactionController extends Controller
     private function handleTrustFlowPayment()
     {
         $order_id = Str::random(20);
-        $hash = $this->trustflow->getHash($order_id);
+        $hash = $this->trustflow->getHash(true, $order_id);
         $payload = [
             'AMOUNT' => '1000',
             'APP_ID' => '1213240327171820',
@@ -187,7 +187,7 @@ class TransactionController extends Controller
             'ORDER_ID' => $order_id,
             'PAYMENT_TYPE' => 'CC',
             'PRODUCT_DESC' => 'Valerian Streel Blades',
-            'RETURN_URL' => 'http://127.0.0.1:8000/test',
+            'RETURN_URL' => 'http://127.0.0.1:8000/trust-flow-pay-redirect',
             'TXNTYPE' => 'SALE',
             'HASH' => $hash
         ];
@@ -202,6 +202,23 @@ class TransactionController extends Controller
             $hash = $data['HASH'];
             return view('payments.trustflow_threeds', compact('app_id', 'trx_id', 'hash'));
         }
+    }
+
+    public function trustflowTranxStatus()
+    {
+        $hash = $this->trustflow->getHash(false, $order_id = '5cSJSo9WW7KmbVtGY8wg');
+        $payload = [
+            'AMOUNT' => '1000',
+            'APP_ID' => '1213240327171820',
+            'CURRENCY_CODE' => '840',
+            'ORDER_ID' => 'ElisrMAI7p059fxK3VOc',
+            'TXN_ID' => '1220241127174227',
+            'HASH' => $hash
+        ];
+
+        $createTranx = $this->trustflow->checkStatus($payload);
+        $data = json_decode($createTranx, true);
+        dd($data);
     }
 
     /**
