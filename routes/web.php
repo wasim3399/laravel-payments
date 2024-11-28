@@ -27,6 +27,7 @@ Route::get('/payment', function () {
 //Route::any('payment/{token}', [\App\Http\Controllers\Payment\TransactionController::class, 'payment']);
 Route::get('payment/{token}', [TransactionController::class, 'loadPaymentPage']);
 Route::post('makePayment', [TransactionController::class, 'makePayment'])->name('makePayment');
+Route::post('/trust-flow-pay-redirect', [TransactionController::class, 'trustFlowPayRedirect']);
 Route::get('trustflow-tranx-status', [TransactionController::class, 'trustflowTranxStatus']);
 
 Route::post('getIgCallback', [TransactionController::class, 'getIgCallback'])->name('getIgCallback');

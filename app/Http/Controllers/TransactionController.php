@@ -164,7 +164,7 @@ class TransactionController extends Controller
     private function handleTrustFlowPayment()
     {
         $order_id = Str::random(20);
-        $hash = $this->trustflow->getHash(true, $order_id);
+        $hash = $this->trustflow->getHash($order_id);
         $payload = [
             'AMOUNT' => '1000',
             'APP_ID' => '1213240327171820',
@@ -204,21 +204,32 @@ class TransactionController extends Controller
         }
     }
 
-    public function trustflowTranxStatus()
+    public function trustFlowPayRedirect()
     {
-        $hash = $this->trustflow->getHash(false, $order_id = '5cSJSo9WW7KmbVtGY8wg');
+        return response()->make('<script>window.close();</script>');
+    }
+
+    public function trustflowTranxStatus(Request $request)
+    {
+        $hash = self::createHash($request->order_id, $request->trx_id);
         $payload = [
             'AMOUNT' => '1000',
             'APP_ID' => '1213240327171820',
             'CURRENCY_CODE' => '840',
-            'ORDER_ID' => 'ElisrMAI7p059fxK3VOc',
-            'TXN_ID' => '1220241127174227',
+            'ORDER_ID' => $request->order_id,
+            'TXN_ID' => $request->trx_id,
             'HASH' => $hash
         ];
 
         $createTranx = $this->trustflow->checkStatus($payload);
         $data = json_decode($createTranx, true);
         dd($data);
+    }
+
+    private function createHash($order_id, $trx_id)
+    {
+        $payloadString = 'AMOUNT=1000~APP_ID=1213240327171820~CURRENCY_CODE=840~ORDER_ID='.$order_id.'~TXN_ID='.$trx_id.'f037897e6fb8427e';
+        return strtoupper(hash("sha512", $payloadString));
     }
 
     /**
