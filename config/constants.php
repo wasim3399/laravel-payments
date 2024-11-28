@@ -34,5 +34,15 @@ return [
     "TRUST_FLOW_PAY_SETTLED_CURRENCY" => "USD",
     "TRUST_FLOW_CURRENCY_CODE" => 840,
 
+    //WEZLY CONSTANTS
+    "WEZLY_BASE_URL" => 'https://stage.wezly.io/backend/api/',
+    'WEZLY_SETTLED_CURRENCY' => 'EUR',
+    "WEZLY_CALLBACK_URL" => 'http://127.0.0.1:8000/callback/wezly-callback',
+    "WEZLY_REDIRECT_URL" => 'http://127.0.0.1:8000/wezly-redirect',
+    "WEZLY_MEMBER_ID" => "eyJpdiI6Ilo3YnlaR0RnR0xUcUVRbTFNKzFIOEE9PSIsInZhbHVlIjoiQmhQVGRLblNoOVZJb0dBTy9ITERENytRVTZ
+qbndnUHl4cWQ0bmlES2JEUmw0aFljY3BJUUlJWGc1WmZLSzJlM1o3bE5DY3J5VVFKeVE4Zy9LeE54Nmc9PSIsIm1hYyI6ImRhOWYzM2I5YTljNTJjNDUw
+ZDk0ZGUwNjE3M==",
+    "WEZLY_MERCHANT_ID" => "0e9e2077-a1e4-485e-b14e-bd8b3b897586",
+
 
 ];

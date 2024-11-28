@@ -169,7 +169,7 @@ class TransactionController extends Controller
             'AMOUNT' => '1000',
             'APP_ID' => '1213240327171820',
             'CARD_EXP_DT' => '122030',
-            'CARD_NUMBER' => '4111110000000021',
+            'CARD_NUMBER' => '4111110000000211',
             'CURRENCY_CODE' => '840',
             'CUST_CITY' => 'Winterfell',
             'CUST_COUNTRY' => 'US',
