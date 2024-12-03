@@ -1,5 +1,7 @@
 <?php
 
+$base_url = "http://127.0.0.1:8000/";
+
 return [
     // INTERGIRO CONSTANTS
     "INTERGIRO_BASE_URL" => "https://merchant.intergiro.com",
@@ -39,10 +41,25 @@ return [
     'WEZLY_SETTLED_CURRENCY' => 'EUR',
     "WEZLY_CALLBACK_URL" => 'http://127.0.0.1:8000/callback/wezly-callback',
     "WEZLY_REDIRECT_URL" => 'http://127.0.0.1:8000/wezly-redirect',
-    "WEZLY_MEMBER_ID" => "eyJpdiI6Ilo3YnlaR0RnR0xUcUVRbTFNKzFIOEE9PSIsInZhbHVlIjoiQmhQVGRLblNoOVZJb0dBTy9ITERENytRVTZ
-qbndnUHl4cWQ0bmlES2JEUmw0aFljY3BJUUlJWGc1WmZLSzJlM1o3bE5DY3J5VVFKeVE4Zy9LeE54Nmc9PSIsIm1hYyI6ImRhOWYzM2I5YTljNTJjNDUw
-ZDk0ZGUwNjE3M==",
+    "WEZLY_MEMBER_ID" => "eyJpdiI6Ilo3YnlaR0RnR0xUcUVRbTFNKzFIOEE9PSIsInZhbHVlIjoiQmhQVGRLblNoOVZJb0dBTy9ITERENytRVTZqbndnUHl4cWQ0bmlES2JEUmw0aFljY3BJUUlJWGc1WmZLSzJlM1o3bE5DY3J5VVFKeVE4Zy9LeE54Nmc9PSIsIm1hYyI6ImRhOWYzM2I5YTljNTJjNDUwZDk0ZGUwNjE3M==",
     "WEZLY_MERCHANT_ID" => "0e9e2077-a1e4-485e-b14e-bd8b3b897586",
+
+    // EMERCHANTPAY CONSTANTS
+    'EMERCHANTPAY_BASE_URL' => 'https://staging.gate.emerchantpay.net/',
+    #'EMERCHANTPAY_NOTIFICATION_CALLBACK' => $base_url . 'callback/emerchantPay-notification-callback',
+    #'EMERCHANTPAY_THREEDS_METHOD_URL' => $base_url . 'callback/emerchantPay-threeds-method-callback',
+    #'EMERCHANTPAY_SUCCESS_CALLBACK' => $base_url . 'emerchantPay/success-callback',
+    #'EMERCHANTPAY_FAIL_CALLBACK' => $base_url . 'emerchantPay/fail-callback',
+    'EMERCHANTPAY_NOTIFICATION_CALLBACK' => 'https://webhook.site/cardeye-hpp-callback',
+    'EMERCHANTPAY_THREEDS_METHOD_URL' => 'https://webhook.site/cardeye-hpp-callback',
+    'EMERCHANTPAY_SUCCESS_CALLBACK' => 'https://webhook.site/cardeye-hpp-callback',
+    'EMERCHANTPAY_FAIL_CALLBACK' => 'https://webhook.site/cardeye-hpp-callback',
+
+
+    'EMERCHANTPAY_PBK' => '8d0db1748dc8e3062f9849c4eaa7816998ac5331',
+    'EMERCHANTPAY_PVK' => '41b98eedeefc644116fc37e177ebf1ae1c25424c',
+    'EMERCHANTPAY_TOKEN' => '9b029956ebc24bdac87434665e60b6e3caaee486',
+
 
 
 ];
