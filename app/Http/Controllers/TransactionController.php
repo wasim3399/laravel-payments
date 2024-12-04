@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Library\CL;
 use App\Library\Intergiro;
+use App\Library\Paymatico;
 use App\Library\Rendix;
 use App\Library\Trustflow;
 use App\Library\MerchantPay;
@@ -19,19 +20,22 @@ class TransactionController extends Controller
     protected Rendix $rendix;
     protected CL $cl;
     protected Trustflow $trustflow;
+    protected Paymatico $paymatico;
     protected MerchantPay $merchantPay;
     protected SellService $sellService;
+
 
     /**
      * Constructor to initialize services.
      */
-    public function __construct(Intergiro $intergiro, Rendix $rendix, CL $cl, Trustflow $trustflow, MerchantPay $merchantPay, SellService $sellService)
+    public function __construct(Intergiro $intergiro, Rendix $rendix, CL $cl, Trustflow $trustflow, MerchantPay $merchantPay, Paymatico $paymatico, SellService $sellService)
     {
         $this->intergiro = $intergiro;
         $this->rendix = $rendix;
         $this->cl = $cl;
         $this->trustflow = $trustflow;
         $this->merchantPay = $merchantPay;
+        $this->paymatico = $paymatico;
         $this->sellService = $sellService;
     }
 
@@ -112,6 +116,16 @@ class TransactionController extends Controller
         // e-merchant
         if ($request->input('name') === 'e-merchant') {
             return $this->handleMerchantPayPayment();
+        }
+
+        // paysafe
+        if ($request->input('name') === 'paymatico') {
+            return $this->handlePaymaticoPayment();
+        }
+
+        // paysafe
+        if ($request->input('name') === 'paysafe') {
+            return $this->handlePaysafePayment();
         }
 
         //default IG flow
@@ -277,6 +291,39 @@ class TransactionController extends Controller
     private function handleCLPayment()
     {
         return $this->cl->createTranx();
+    }
+
+    private function handlePaymaticoPayment()
+    {
+        $payload = [
+            'order_id' => Str::random(20),
+            'extra' => 'test@gmail.com',
+            'currency' => 'EUR',
+            'return_url' => 'http://google.com',
+            'cancel_url' => 'http://google.com',
+            'notify_url' => 'https://webhook.site/cardeye-hpp-callback',
+            'language' => 'en',
+            'expired_date' => '2024-08-10T14:15:22Z',
+            'products' => [
+                [
+                    'amount' => 1,
+                    'product' => [
+                        'name' => 'cardeye',
+                        'price' => 5
+                    ]
+                ]
+            ]
+        ];
+
+        $responseData = $this->paymatico->createTranx($payload);
+        $data = json_decode($responseData, true);
+        if($data['token'])
+        {
+            $res = $this->paymatico->capturePayment($data['token']);
+            dd($res);
+            $result = json_decode($res, true);
+           dd($result);
+        }
     }
 
     /**

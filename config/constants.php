@@ -55,11 +55,18 @@ return [
     'EMERCHANTPAY_SUCCESS_CALLBACK' => 'https://webhook.site/cardeye-hpp-callback',
     'EMERCHANTPAY_FAIL_CALLBACK' => 'https://webhook.site/cardeye-hpp-callback',
 
-
     'EMERCHANTPAY_PBK' => '8d0db1748dc8e3062f9849c4eaa7816998ac5331',
     'EMERCHANTPAY_PVK' => '41b98eedeefc644116fc37e177ebf1ae1c25424c',
     'EMERCHANTPAY_TOKEN' => '9b029956ebc24bdac87434665e60b6e3caaee486',
 
-
+    // PAYMATICO CONSTANTS
+    "PAYMATICO_BASE_URL" => "https://gateway.paymatico.com/v1/",
+    "PAYMATICO_REDIRECT_URL" => "https://checkout.paymatico.com/en/",
+    "PAYMATICO_RETURN_URL" => $base_url . "paymatico/success-callback",
+    "PAYMATICO_CANCEL_URL" => $base_url . "paymatico/fail-callback",
+    "PAYMATICO_NOTIFY_URL" => $base_url . "callback/paymatico-notify-callback",
+    'PAYMATICO_PBK' => '95de4f05bf0045c8811f588145952c37',
+    'PAYMATICO_PVK' => '1161b2caa99943788effd681818cf1d8',
+    'PAYMATICO_SK' => 'AppKeys 95de4f05bf0045c8811f588145952c37:1161b2caa99943788effd681818cf1d8',
 
 ];
