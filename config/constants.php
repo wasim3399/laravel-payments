@@ -69,4 +69,13 @@ return [
     'PAYMATICO_PVK' => '1161b2caa99943788effd681818cf1d8',
     'PAYMATICO_SK' => 'AppKeys 95de4f05bf0045c8811f588145952c37:1161b2caa99943788effd681818cf1d8',
 
+    // PAYSAFE CONSTANTS
+    "PAYSAFE_BASE_URL" => "https://api.test.paysafe.com/paymenthub/",
+    "PAYSAFE_ACCOUNT_ID" => 1002713200, # 1002765980
+    'PAYSAFE_DEFAULT_CALLBACK' => $base_url . 'paysafe/default-callback',
+    'PAYSAFE_SUCCESS_CALLBACK' => $base_url . 'paysafe/success-callback',
+    'PAYSAFE_FAIL_CALLBACK' => $base_url . 'paysafe/fail-callback',
+    'PAYSAFE_WEBHOOK_SECRET_KEY' => 'a2608023d4e956e94e230662948383eb36278095c8c028e6191bc0a6606eb62edb7debb3b3c6bb485ad80582bd7e
+c68448ec8bde78ff12d03d5d8fe39dfdb11b',
+
 ];

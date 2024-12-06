@@ -58,7 +58,7 @@
     <h1>Payment Approved!</h1>
     <p><strong>Reference:</strong> {{ $data['reference'] }}</p>
     <p><strong>Amount:</strong> €{{ $data['amount'] }}</p>
-    <p><strong>Created At:</strong> {{ \Carbon\Carbon::parse($data['created'])->toDayDateTimeString() }}</p>
+    <p><strong>Created At:</strong> {{ isset($data['created']) ? \Carbon\Carbon::parse($data['created'])->toDayDateTimeString() : '' }}</p>
     <a href="/" class="btn">Go to Homepage</a>
 </div>
 </body>

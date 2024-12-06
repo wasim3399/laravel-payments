@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Library\CL;
 use App\Library\Intergiro;
 use App\Library\Paymatico;
+use App\Library\Paysafe;
 use App\Library\Rendix;
 use App\Library\Trustflow;
 use App\Library\MerchantPay;
@@ -21,6 +22,7 @@ class TransactionController extends Controller
     protected CL $cl;
     protected Trustflow $trustflow;
     protected Paymatico $paymatico;
+    protected Paysafe $paysafe;
     protected MerchantPay $merchantPay;
     protected SellService $sellService;
 
@@ -28,7 +30,7 @@ class TransactionController extends Controller
     /**
      * Constructor to initialize services.
      */
-    public function __construct(Intergiro $intergiro, Rendix $rendix, CL $cl, Trustflow $trustflow, MerchantPay $merchantPay, Paymatico $paymatico, SellService $sellService)
+    public function __construct(Intergiro $intergiro, Rendix $rendix, CL $cl, Trustflow $trustflow, MerchantPay $merchantPay, Paysafe $paysafe, Paymatico $paymatico, SellService $sellService)
     {
         $this->intergiro = $intergiro;
         $this->rendix = $rendix;
@@ -36,6 +38,7 @@ class TransactionController extends Controller
         $this->trustflow = $trustflow;
         $this->merchantPay = $merchantPay;
         $this->paymatico = $paymatico;
+        $this->paysafe = $paysafe;
         $this->sellService = $sellService;
     }
 
@@ -321,10 +324,72 @@ class TransactionController extends Controller
         {
             $res = $this->paymatico->capturePayment($data['token']);
             dd($res);
-            $result = json_decode($res, true);
-           dd($result);
         }
     }
+
+    private function handlePaysafePayment()
+    {
+        $payload = [
+            'merchantRefNum' => Str::random(20),
+            'transactionType' => 'PAYMENT',
+            'card' => [
+                'cardNum' => '4000000000001026',
+                'cardExpiry' => [
+                    'month' => 10,
+                    'year' => 2025,
+                ],
+                'cvv' => '111',
+                'holderName' => 'Dilip',
+            ],
+            'accountId' => '1002713200',
+            'paymentType' => 'CARD',
+            'amount' => 500,
+            'currencyCode' => 'USD',
+            'billingDetails' => [
+                'nickName' => 'Home',
+                'street' => 'abcd',
+                'city' => 'defg',
+                'state' => 'AL',
+                'country' => 'US',
+                'zip' => '94404',
+            ],
+            'returnLinks' => [
+                [
+                    'rel' => 'default',
+                    'href' => 'https://usgaminggamblig.com/payment/return/',
+                    'method' => 'GET',
+                ],
+                [
+                    'rel' => 'on_completed',
+                    'href' => 'https://usgaminggamblig.com/payment/return/success',
+                    'method' => 'GET',
+                ],
+                [
+                    'rel' => 'on_failed',
+                    'href' => 'https://usgaminggamblig.com/payment/return/failed',
+                    'method' => 'GET',
+                ],
+            ],
+        ];
+
+        $responseData = $this->paysafe->createPaymentHandle($payload);
+        $data = json_decode($responseData, true);
+        if(isset($data['status']) && $data['status'] == 'PAYABLE')
+        {
+            $res = $this->paysafe->capturePayment($data);
+            $captureResponse = json_decode($res, true);
+            if(isset($captureResponse['status']) && $captureResponse['status'] == 'COMPLETED')
+            {
+                $captureResponse['reference'] = $captureResponse['id'];
+                return view('payments.success', ['data' => $captureResponse]);
+            } else {
+                return view('payments.fail', ['data' => $captureResponse]);
+            }
+        }
+
+    }
+
+
 
     /**
      * Handle Rendix payment flow.
