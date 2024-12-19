@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FileUploadController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,3 +32,9 @@ Route::post('/trust-flow-pay-redirect', [TransactionController::class, 'trustFlo
 Route::get('trustflow-tranx-status', [TransactionController::class, 'trustflowTranxStatus']);
 
 Route::post('getIgCallback', [TransactionController::class, 'getIgCallback'])->name('getIgCallback');
+
+
+Route::get('/upload', [FileUploadController::class, 'showUploadForm'])->name('upload.form');
+Route::post('/upload', [FileUploadController::class, 'handleUpload'])->name('upload.handle');
+Route::get('/store-data', [FileUploadController::class, 'store'])->name('upload.store');
+
