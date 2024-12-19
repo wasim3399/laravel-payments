@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessCsvData;
 use App\Models\CardInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
@@ -42,7 +43,11 @@ class FileUploadController extends Controller
             file_put_contents($path. $name, $chunk);
 
         }
-        echo 'done';
+
+        # store data with queues
+        $response = $this->store();
+
+        return $response;
     }
 
     public function store()
@@ -51,49 +56,13 @@ class FileUploadController extends Controller
         $files = glob($path . '/*.csv'); // Get all CSV files in the uploads folder
 
         foreach ($files as $file) {
-            $rows = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES); // Read all lines of the file
-            $insertData = []; // Array to store rows for bulk insert
+            $data = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES); // Read all lines of the file
 
-            foreach ($rows as $index => $row) {
-                // Skip header row if present
-                if ($index === 0 && str_contains($row, 'card_bin')) {
-                    continue;
-                }
-
-                // Split the row into columns using the delimiter
-                $data = explode(';', $row);
-
-                // Ensure the row has the correct number of columns before processing
-                if (count($data) < 14) {
-                    continue; // Skip invalid rows
-                }
-
-                // Prepare the data for bulk insert
-                $insertData[] = [
-                    'card_bin' => $data[0],
-                    'brand' => $data[1],
-                    'issuer' => $data[2],
-                    'type' => $data[3],
-                    'level' => $data[4],
-                    'country_card_issue' => $data[5],
-                    'iso_country' => $data[6],
-                    'iso_a3' => $data[7],
-                    'iso_number' => $data[8],
-                    'www' => $data[9],
-                    'phone' => $data[10],
-                    'extra1' => $data[11],
-                    'extra2' => $data[12],
-                    'extra3' => $data[13],
-                ];
-            }
-
-            // Perform bulk insert into the database
-            if (!empty($insertData)) {
-                CardInfo::insert($insertData);
-            }
+            # dispatch job
+            ProcessCsvData::dispatch($data);
         }
 
-        return response()->json(['message' => 'CSV files processed and data inserted successfully!']);
+        return response()->json(['status' => true, 'message' => 'CSV files processed and data inserted successfully!']);
     }
 
 }
