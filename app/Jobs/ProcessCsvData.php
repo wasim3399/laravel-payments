@@ -3,12 +3,13 @@
 namespace App\Jobs;
 
 use App\Models\CardInfo;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
 class ProcessCsvData implements ShouldQueue
 {
-    use Queueable;
+    use Batchable, Queueable;
     public $data;
 
     /**
@@ -24,12 +25,8 @@ class ProcessCsvData implements ShouldQueue
      */
     public function handle(): void
     {
-        $insertData = []; // Array to store rows for bulk insert
-        foreach ($this->data as $index => $row) {
-            // Skip header row if present
-            if ($index === 0 && str_contains($row, 'card_bin')) {
-                continue;
-            }
+        $insertData = [];
+        foreach ($this->data as $row) {
 
             // Split the row into columns using the delimiter
             $data = explode(';', $row);
@@ -57,10 +54,10 @@ class ProcessCsvData implements ShouldQueue
                 'extra3' => $data[13],
             ];
         }
-
         // Perform bulk insert into the database
         if (!empty($insertData)) {
             CardInfo::insert($insertData);
+            dump(CardInfo::count());
         }
     }
 }
