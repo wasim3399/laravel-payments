@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ProcessCsvData;
-use App\Models\CardInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\File;
 use App\Jobs\ProcessCsvChunk;
 use App\Models\FileUploadStatus;
-use Stripe\Card;
 
 class FileUploadController extends Controller
 {
