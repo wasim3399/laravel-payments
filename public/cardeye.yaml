@@ -1,0 +1,2842 @@
+openapi: 2.0.0
+info:
+  description: |
+    # Introduction
+      <p>CardEye is a payment gateway service merchants can use to provide remote and frictionless payment options.</p>
+
+
+      ## OneShot Experience
+          The image below shows the payment journey that your customer will see with our hosted payment page.
+          <img src="/storage/apiDocFiles/json/interface-flow.svg"/>
+
+
+      ## Swimlane Flow
+          This is how the transaction flow is executed involving all stakeholders.<br>
+          <p><b>Hosted Payment Page API</b> (Both 3DS/N3DS flow)</p>
+          <img src="/storage/apiDocFiles/json/swimlane.svg"/><br/><br/>
+          <p><b>Server to Server API</b> (3DS flow)</p>
+          <img src="/storage/apiDocFiles/json/swimlane-2.svg"/><br/><br/>
+          <p><b>Server to Server API</b> (N3DS flow)</p>
+          <img src="/storage/apiDocFiles/json/non3ds.svg">
+
+    # Environments
+      These are the BaseUrls for the APIs different environments:
+         <table style="th, td { border-bottom: 1px solid #ddd;}">
+         <tr>
+           <th>Environment</th>
+           <th>BaseUrl</th>
+         </tr>
+         <tr>
+           <td>Staging</td>
+           <td>https://staging-pay.cardeye.com</td>
+         </tr>
+         <tr>
+           <td>Production</td>
+           <td>https://pay.cardeye.com</td>
+         </tr>
+         </table>
+
+    # Integration
+      <p>After getting though the CardEye onboarding process, the Merchant will get the following details, and these details will be required to send the request payload for authorization.</p>
+      <ol>
+      <li><a href="#section/Authorization">Authorization Key</a></li>
+      </ol>
+
+      ## Sandbox Guide
+        <p>Make sure to use the Sandbox BaseUrl: <a href="https://staging-pay.cardeye.com">https://staging-pay.cardeye.com</a></p>
+        <p>Test your integration by using your Sandbox Keys:</p>
+          <ol>
+            <li>Authorization Key</li>
+          </ol>
+        <p>To simulate different scenarios, the API uses different card numbers to return either a Challenge (3DS) or Frictionless (Non-3DS)</p>
+        <p>Below is a table containing the parameters for the different test scenarios.</p>
+          <table style="th, td { border-bottom: 1px solid #ddd;}">
+            <tr>
+              <th>PAN</th>
+              <th>CVC</th>
+              <th>Card Expiry</th>
+              <th>Type</th>
+            </tr>
+            <tr>
+              <td>4111111111111111</td>
+              <td>Any</td>
+              <td>Any future date</td>
+              <td>3DS Challenge</td>
+            </tr>
+            <tr>
+              <td>5100000000000131</td>
+              <td>Any</td>
+              <td>Any future date</td>
+              <td>3DS Challenge</td>
+            </tr>
+            <tr>
+              <td>5135020000005871</td>
+              <td>Any</td>
+              <td>Any future date</td>
+              <td>Frictionless Flow</td>
+            </tr>
+          </table>
+            <em><b>Note: To perform all possible test scenarios <a href="https://docs.google.com/spreadsheets/d/1l1tDzfkPn6xqWA5My9F3HwUSYFoyiwym-U4AD_nykZI/edit?usp=sharing" target="_blank">click here</a> to get the list of test cards</em>
+
+      ## Livemode Guide
+          <p>Once you have tested your integration and verified that it works, you can go live.</p>
+          <p>Make sure to use the Live BaseUrl: <a href="https://pay.cardeye.com/" target="_">https://pay.cardeye.com/</a></p>
+          <p>Update your integration by using your Live Keys:</p>
+          <ol>
+            <li><a href="#section/Authorization/Authorization-Key">Authorization Key</a></li>
+          </ol>
+          <p>The Live environment is different from the Sandbox environment:</p>
+          <ul>
+            <li>When you post requests to the Live environment, you are making real purchases.</li><br>
+            <li>You can not simulate different scenarios in the Live environment, but you can try making purchases using various payment cards.</li> <br>
+            <li>In the Live environment, you must use real card details to make a transaction.</li> <br>
+            <li>Transactions made in the Live environment will pass through CardEye's transaction monitoring system, which means that transactions can be declined due to several reasons, such as purchase limits, geographical or IP limits or fraud detection filter. This is expected behaviour. If you have concerns about a transaction that was declined in the Live environment, contact our tech support team.</li> <br>
+          </ul>
+           <em><b>Note: Safari is not supported by Cardeye right now</b></em>
+
+    # Authorization
+
+    ## Authorization Key
+      <p>This API uses an authorization key for authentication, uniquely provided to the merchant after registration by CardEye admin, and should never be exposed or revealed to anyone.<br/>
+        The purpose of using the authorization key is to ensure the authenticity of the merchant. The merchant will need to send the authorization key in the headers of every request.</p>
+
+
+  ## Declined Reasons
+  ########################### Application Introduction ########################
+  version: 1.0.0
+  title: CardEye API
+  x-logo:
+    url: /storage/apiDocFiles/json/api-doc-logo.png
+  contact:
+    name: Support
+    email: support@cardeye.com
+############################ Tags ############################################
+
+tags:
+
+  -  name: Currencies & Geographical  locations
+     description: |
+        Recent changes and additions to CardEye API's are currently being tracked here.
+        ## Supported Fiat Currencies
+            <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>AED</td>
+                            <td>United Arab Emirates Dirham</td>
+                        </tr>
+                        <tr>
+                            <td>AFN</td>
+                            <td>Afghan Afghani</td>
+                        </tr>
+                        <tr>
+                            <td>ALL</td>
+                            <td>Albanian Lek</td>
+                        </tr>
+                        <tr>
+                            <td>AMD</td>
+                            <td>Armenian Dram</td>
+                        </tr>
+                        <tr>
+                            <td>ANG</td>
+                            <td>Netherlands Antillean Guilder</td>
+                        </tr>
+                        <tr>
+                            <td>AOA</td>
+                            <td>Angolan Kwanza</td>
+                        </tr>
+                        <tr>
+                            <td>ARS</td>
+                            <td>Argentine Peso</td>
+                        </tr>
+                        <tr>
+                            <td>AUD</td>
+                            <td>Australian Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>AWG</td>
+                            <td>Aruban Florin</td>
+                        </tr>
+                        <tr>
+                            <td>AZN</td>
+                            <td>Azerbaijani Manat</td>
+                        </tr>
+                        <tr>
+                            <td>BAM</td>
+                            <td>Bosnia-Herzegovina Convertible Mark</td>
+                        </tr>
+                        <tr>
+                            <td>BBD</td>
+                            <td>Barbadian Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>BDT</td>
+                            <td>Bangladeshi Taka</td>
+                        </tr>
+                        <tr>
+                            <td>BGN</td>
+                            <td>Bulgarian Lev</td>
+                        </tr>
+                        <tr>
+                            <td>BHD</td>
+                            <td>Bahraini Dinar</td>
+                        </tr>
+                        <tr>
+                            <td>BIF</td>
+                            <td>Burundian Franc</td>
+                        </tr>
+                        <tr>
+                            <td>BMD</td>
+                            <td>Bermudan Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>BND</td>
+                            <td>Brunei Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>BOB</td>
+                            <td>Bolivian Boliviano</td>
+                        </tr>
+                        <tr>
+                            <td>BRL</td>
+                            <td>Brazilian Real</td>
+                        </tr>
+                        <tr>
+                            <td>BSD</td>
+                            <td>Bahamian Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>BTC</td>
+                            <td>Bitcoin</td>
+                        </tr>
+                        <tr>
+                            <td>BTN</td>
+                            <td>Bhutanese Ngultrum</td>
+                        </tr>
+                        <tr>
+                            <td>BWP</td>
+                            <td>Botswanan Pula</td>
+                        </tr>
+                        <tr>
+                            <td>BYR</td>
+                            <td>Belarusian Ruble</td>
+                        </tr>
+                        <tr>
+                            <td>BYN</td>
+                            <td>New Belarusian Ruble</td>
+                        </tr>
+                        <tr>
+                            <td>BZD</td>
+                            <td>Belize Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>CAD</td>
+                            <td>Canadian Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>CDF</td>
+                            <td>Congolese Franc</td>
+                        </tr>
+                        <tr>
+                            <td>CHF</td>
+                            <td>Swiss Franc</td>
+                        </tr>
+                        <tr>
+                            <td>CLF</td>
+                            <td>Chilean Unit of Account (UF)</td>
+                        </tr>
+                        <tr>
+                            <td>CLP</td>
+                            <td>Chilean Peso</td>
+                        </tr>
+                        <tr>
+                            <td>CNY</td>
+                            <td>Chinese Yuan</td>
+                        </tr>
+                        <tr>
+                            <td>COP</td>
+                            <td>Colombian Peso</td>
+                        </tr>
+                        <tr>
+                            <td>CRC</td>
+                            <td>Costa Rican Colón</td>
+                        </tr>
+                        <tr>
+                            <td>CUC</td>
+                            <td>Cuban Convertible Peso</td>
+                        </tr>
+                        <tr>
+                            <td>CUP</td>
+                            <td>Cuban Peso</td>
+                        </tr>
+                        <tr>
+                            <td>CVE</td>
+                            <td>Cape Verdean Escudo</td>
+                        </tr>
+                        <tr>
+                            <td>CZK</td>
+                            <td>Czech Republic Koruna</td>
+                        </tr>
+                        <tr>
+                            <td>DJF</td>
+                            <td>Djiboutian Franc</td>
+                        </tr>
+                        <tr>
+                            <td>DKK</td>
+                            <td>Danish Krone</td>
+                        </tr>
+                        <tr>
+                            <td>DOP</td>
+                            <td>Dominican Peso</td>
+                        </tr>
+                        <tr>
+                            <td>DZD</td>
+                            <td>Algerian Dinar</td>
+                        </tr>
+                        <!--<tr>
+                            <td>EEK</td>
+                            <td>Estonian Kroon</td>
+                        </tr>-->
+                        <tr>
+                            <td>EGP</td>
+                            <td>Egyptian Pound</td>
+                        </tr>
+                        <tr>
+                            <td>ERN</td>
+                            <td>Eritrean Nakfa</td>
+                        </tr>
+                        <tr>
+                            <td>ETB</td>
+                            <td>Ethiopian Birr</td>
+                        </tr>
+                        <tr>
+                            <td>EUR</td>
+                            <td>Euro</td>
+                        </tr>
+                        <tr>
+                            <td>FJD</td>
+                            <td>Fijian Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>FKP</td>
+                            <td>Falkland Islands Pound</td>
+                        </tr>
+                        <tr>
+                            <td>GBP</td>
+                            <td>British Pound Sterling</td>
+                        </tr>
+                        <tr>
+                            <td>GEL</td>
+                            <td>Georgian Lari</td>
+                        </tr>
+                        <tr>
+                            <td>GGP</td>
+                            <td>Guernsey Pound</td>
+                        </tr>
+                        <tr>
+                            <td>GHS</td>
+                            <td>Ghanaian Cedi</td>
+                        </tr>
+                        <tr>
+                            <td>GIP</td>
+                            <td>Gibraltar Pound</td>
+                        </tr>
+                        <tr>
+                            <td>GMD</td>
+                            <td>Gambian Dalasi</td>
+                        </tr>
+                        <tr>
+                            <td>GNF</td>
+                            <td>Guinean Franc</td>
+                        </tr>
+                        <tr>
+                            <td>GTQ</td>
+                            <td>Guatemalan Quetzal</td>
+                        </tr>
+                        <tr>
+                            <td>GYD</td>
+                            <td>Guyanaese Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>HKD</td>
+                            <td>Hong Kong Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>HNL</td>
+                            <td>Honduran Lempira</td>
+                        </tr>
+                        <tr>
+                            <td>HRK</td>
+                            <td>Croatian Kuna</td>
+                        </tr>
+                        <tr>
+                            <td>HTG</td>
+                            <td>Haitian Gourde</td>
+                        </tr>
+                        <tr>
+                            <td>HUF</td>
+                            <td>Hungarian Forint</td>
+                        </tr>
+                        <tr>
+                            <td>IDR</td>
+                            <td>Indonesian Rupiah</td>
+                        </tr>
+                        <tr>
+                            <td>ILS</td>
+                            <td>Israeli New Sheqel</td>
+                        </tr>
+                        <tr>
+                            <td>IMP</td>
+                            <td>Manx pound</td>
+                        </tr>
+                        <tr>
+                            <td>INR</td>
+                            <td>Indian Rupee</td>
+                        </tr>
+                        <tr>
+                            <td>IQD</td>
+                            <td>Iraqi Dinar</td>
+                        </tr>
+                        <tr>
+                            <td>IRR</td>
+                            <td>Iranian Rial</td>
+                        </tr>
+                        <tr>
+                            <td>ISK</td>
+                            <td>Icelandic Króna</td>
+                        </tr>
+                        <tr>
+                            <td>JEP</td>
+                            <td>Jersey Pound</td>
+                        </tr>
+                        <tr>
+                            <td>JMD</td>
+                            <td>Jamaican Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>JOD</td>
+                            <td>Jordanian Dinar</td>
+                        </tr>
+                        <tr>
+                            <td>JPY</td>
+                            <td>Japanese Yen</td>
+                        </tr>
+                        <tr>
+                            <td>KES</td>
+                            <td>Kenyan Shilling</td>
+                        </tr>
+                        <tr>
+                            <td>KGS</td>
+                            <td>Kyrgystani Som</td>
+                        </tr>
+                        <tr>
+                            <td>KHR</td>
+                            <td>Cambodian Riel</td>
+                        </tr>
+                        <tr>
+                            <td>KMF</td>
+                            <td>Comorian Franc</td>
+                        </tr>
+                        <tr>
+                            <td>KPW</td>
+                            <td>North Korean Won</td>
+                        </tr>
+                        <tr>
+                            <td>KRW</td>
+                            <td>South Korean Won</td>
+                        </tr>
+                        <tr>
+                            <td>KWD</td>
+                            <td>Kuwaiti Dinar</td>
+                        </tr>
+                        <tr>
+                            <td>KYD</td>
+                            <td>Cayman Islands Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>KZT</td>
+                            <td>Kazakhstani Tenge</td>
+                        </tr>
+                        <tr>
+                            <td>LAK</td>
+                            <td>Laotian Kip</td>
+                        </tr>
+                        <tr>
+                            <td>LBP</td>
+                            <td>Lebanese Pound</td>
+                        </tr>
+                        <tr>
+                            <td>LKR</td>
+                            <td>Sri Lankan Rupee</td>
+                        </tr>
+                        <tr>
+                            <td>LRD</td>
+                            <td>Liberian Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>LSL</td>
+                            <td>Lesotho Loti</td>
+                        </tr>
+                        <tr>
+                            <td>LTL</td>
+                            <td>Lithuanian Litas</td>
+                        </tr>
+                        <tr>
+                            <td>LVL</td>
+                            <td>Latvian Lats</td>
+                        </tr>
+                        <tr>
+                            <td>LYD</td>
+                            <td>Libyan Dinar</td>
+                        </tr>
+                        <tr>
+                            <td>MAD</td>
+                            <td>Moroccan Dirham</td>
+                        </tr>
+                        <tr>
+                            <td>MDL</td>
+                            <td>Moldovan Leu</td>
+                        </tr>
+                        <tr>
+                            <td>MGA</td>
+                            <td>Malagasy Ariary</td>
+                        </tr>
+                        <tr>
+                            <td>MKD</td>
+                            <td>Macedonian Denar</td>
+                        </tr>
+                        <tr>
+                            <td>MMK</td>
+                            <td>Myanma Kyat</td>
+                        </tr>
+                        <tr>
+                            <td>MNT</td>
+                            <td>Mongolian Tugrik</td>
+                        </tr>
+                        <tr>
+                            <td>MOP</td>
+                            <td>Macanese Pataca</td>
+                        </tr>
+                        <tr>
+                            <td>MRO</td>
+                            <td>Mauritanian Ouguiya</td>
+                        </tr>
+                        <tr>
+                            <td>MUR</td>
+                            <td>Mauritian Rupee</td>
+                        </tr>
+                        <tr>
+                            <td>MVR</td>
+                            <td>Maldivian Rufiyaa</td>
+                        </tr>
+                        <tr>
+                            <td>MWK</td>
+                            <td>Malawian Kwacha</td>
+                        </tr>
+                        <tr>
+                            <td>MXN</td>
+                            <td>Mexican Peso</td>
+                        </tr>
+                        <tr>
+                            <td>MYR</td>
+                            <td>Malaysian Ringgit</td>
+                        </tr>
+                        <tr>
+                            <td>MZN</td>
+                            <td>Mozambican Metical</td>
+                        </tr>
+                        <tr>
+                            <td>NAD</td>
+                            <td>Namibian Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>NGN</td>
+                            <td>Nigerian Naira</td>
+                        </tr>
+                        <tr>
+                            <td>NIO</td>
+                            <td>Nicaraguan Córdoba</td>
+                        </tr>
+                        <tr>
+                            <td>NOK</td>
+                            <td>Norwegian Krone</td>
+                        </tr>
+                        <tr>
+                            <td>NPR</td>
+                            <td>Nepalese Rupee</td>
+                        </tr>
+                        <tr>
+                            <td>NZD</td>
+                            <td>New Zealand Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>OMR</td>
+                            <td>Omani Rial</td>
+                        </tr>
+                        <tr>
+                            <td>PAB</td>
+                            <td>Panamanian Balboa</td>
+                        </tr>
+                        <tr>
+                            <td>PEN</td>
+                            <td>Peruvian Nuevo Sol</td>
+                        </tr>
+                        <tr>
+                            <td>PGK</td>
+                            <td>Papua New Guinean Kina</td>
+                        </tr>
+                        <tr>
+                            <td>PHP</td>
+                            <td>Philippine Peso</td>
+                        </tr>
+                        <tr>
+                            <td>PKR</td>
+                            <td>Pakistani Rupee</td>
+                        </tr>
+                        <tr>
+                            <td>PLN</td>
+                            <td>Polish Zloty</td>
+                        </tr>
+                        <tr>
+                            <td>PYG</td>
+                            <td>Paraguayan Guarani</td>
+                        </tr>
+                        <tr>
+                            <td>QAR</td>
+                            <td>Qatari Rial</td>
+                        </tr>
+                        <tr>
+                            <td>RON</td>
+                            <td>Romanian Leu</td>
+                        </tr>
+                        <tr>
+                            <td>RSD</td>
+                            <td>Serbian Dinar</td>
+                        </tr>
+                        <tr>
+                            <td>RUB</td>
+                            <td>Russian Ruble</td>
+                        </tr>
+                        <tr>
+                            <td>RWF</td>
+                            <td>Rwandan Franc</td>
+                        </tr>
+                        <tr>
+                            <td>SAR</td>
+                            <td>Saudi Riyal</td>
+                        </tr>
+                        <tr>
+                            <td>SBD</td>
+                            <td>Solomon Islands Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>SCR</td>
+                            <td>Seychellois Rupee</td>
+                        </tr>
+                        <tr>
+                            <td>SDG</td>
+                            <td>Sudanese Pound</td>
+                        </tr>
+                        <tr>
+                            <td>SEK</td>
+                            <td>Swedish Krona</td>
+                        </tr>
+                        <tr>
+                            <td>SGD</td>
+                            <td>Singapore Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>SHP</td>
+                            <td>Saint Helena Pound</td>
+                        </tr>
+                        <tr>
+                            <td>SLL</td>
+                            <td>Sierra Leonean Leone</td>
+                        </tr>
+                        <tr>
+                            <td>SOS</td>
+                            <td>Somali Shilling</td>
+                        </tr>
+                        <tr>
+                            <td>SRD</td>
+                            <td>Surinamese Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>STD</td>
+                            <td>São Tomé and Príncipe Dobra</td>
+                        </tr>
+                        <tr>
+                            <td>SVC</td>
+                            <td>Salvadoran Colón</td>
+                        </tr>
+                        <tr>
+                            <td>SYP</td>
+                            <td>Syrian Pound</td>
+                        </tr>
+                        <tr>
+                            <td>SZL</td>
+                            <td>Swazi Lilangeni</td>
+                        </tr>
+                        <tr>
+                            <td>THB</td>
+                            <td>Thai Baht</td>
+                        </tr>
+                        <tr>
+                            <td>TJS</td>
+                            <td>Tajikistani Somoni</td>
+                        </tr>
+                        <tr>
+                            <td>TMT</td>
+                            <td>Turkmenistani Manat</td>
+                        </tr>
+                        <tr>
+                            <td>TND</td>
+                            <td>Tunisian Dinar</td>
+                        </tr>
+                        <tr>
+                            <td>TOP</td>
+                            <td>Tongan Paʻanga</td>
+                        </tr>
+                        <tr>
+                            <td>TRY</td>
+                            <td>Turkish Lira</td>
+                        </tr>
+                        <tr>
+                            <td>TTD</td>
+                            <td>Trinidad and Tobago Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>TWD</td>
+                            <td>New Taiwan Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>TZS</td>
+                            <td>Tanzanian Shilling</td>
+                        </tr>
+                        <tr>
+                            <td>UAH</td>
+                            <td>Ukrainian Hryvnia</td>
+                        </tr>
+                        <tr>
+                            <td>UGX</td>
+                            <td>Ugandan Shilling</td>
+                        </tr>
+                        <tr>
+                            <td>USD</td>
+                            <td>United States Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>UYU</td>
+                            <td>Uruguayan Peso</td>
+                        </tr>
+                        <tr>
+                            <td>UZS</td>
+                            <td>Uzbekistan Som</td>
+                        </tr>
+                        <tr>
+                            <td>VEF</td>
+                            <td>Venezuelan Bolívar Fuerte</td>
+                        </tr>
+                        <tr>
+                            <td>VND</td>
+                            <td>Vietnamese Dong</td>
+                        </tr>
+                        <tr>
+                            <td>VUV</td>
+                            <td>Vanuatu Vatu</td>
+                        </tr>
+                        <tr>
+                            <td>WST</td>
+                            <td>Samoan Tala</td>
+                        </tr>
+                        <tr>
+                            <td>XAF</td>
+                            <td>CFA Franc BEAC</td>
+                        </tr>
+                        <tr>
+                            <td>XAG</td>
+                            <td>Silver (troy ounce)</td>
+                        </tr>
+                        <tr>
+                            <td>XAU</td>
+                            <td>Gold (troy ounce)</td>
+                        </tr>
+                        <tr>
+                            <td>XCD</td>
+                            <td>East Caribbean Dollar</td>
+                        </tr>
+                        <tr>
+                            <td>XDR</td>
+                            <td>Special Drawing Rights</td>
+                        </tr>
+                        <tr>
+                            <td>XOF</td>
+                            <td>CFA Franc BCEAO</td>
+                        </tr>
+                        <tr>
+                            <td>XPF</td>
+                            <td>CFP Franc</td>
+                        </tr>
+                        <tr>
+                            <td>YER</td>
+                            <td>Yemeni Rial</td>
+                        </tr>
+                        <tr>
+                            <td>ZAR</td>
+                            <td>South African Rand</td>
+                        </tr>
+                        <tr>
+                            <td>ZMK</td>
+                            <td>Zambian Kwacha (pre-2013)</td>
+                        </tr>
+                        <tr>
+                            <td>ZMW</td>
+                            <td>Zambian Kwacha</td>
+                        </tr>
+                        <tr>
+                            <td>ZWL</td>
+                            <td>Zimbabwean Dollar</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+        ## Supported Countries
+          Cardeye supports the countries listed below.
+          <table id="supported_countries">
+            <thead>
+            <tr>
+            <th>Country Name</th>
+            <th>Country Code</th>
+            </tr>
+            </thead>
+            <tbody id="tb_data_country">
+            <tr>
+            <td>Argentina</td> <td>AR</td>
+            </tr>
+            <tr>
+            <td>Australia </td> <td>AU</td>
+            </tr>
+            <tr>
+            <td>Austria</td> <td>AT</td>
+            </tr>
+            <tr>
+            <td>Belgium</td> <td>BE</td>
+            </tr>
+            <tr>
+            <td>Brazil</td> <td>BR</td>
+            </tr>
+            <tr>
+            <td>Bulgaria</td> <td>BG</td>
+            </tr>
+            <tr>
+            <td>Canada</td> <td>CA</td>
+            </tr>
+            <tr>
+            <td>Chile</td> <td>CL</td>
+            </tr>
+            <tr>
+            <td>China</td> <td>CN</td>
+            </tr>
+            <tr>
+            <td>Costa Rica</td> <td>CR</td>
+            </tr>
+            <tr>
+            <td>Croatia</td> <td>HR</td>
+            </tr>
+            <tr>
+            <td>Cyprus</td> <td>CY</td>
+            </tr>
+            <tr>
+            <td>Czech Republic</td> <td>CZ</td>
+            </tr>
+            <tr>
+            <td>Denmark</td> <td>DK</td>
+            </tr>
+            <tr>
+            <td>Estonia</td> <td>EE</td>
+            </tr>
+            <tr>
+            <td>Finland</td> <td>FI</td>
+            </tr>
+            <tr>
+            <td>France</td> <td>FR</td>
+            </tr>
+            <tr>
+            <td>Germany</td> <td>DE</td>
+            </tr>
+            <tr>
+            <td>Gibraltar</td> <td>GI</td>
+            </tr>
+            <tr>
+            <td>Greece</td> <td>GR</td>
+            </tr>
+            <tr>
+            <td>Hungary</td> <td>HU</td>
+            </tr>
+            <tr>
+            <td>India</td> <td>IN</td>
+            </tr>
+            <tr>
+            <td>Ireland</td> <td>IE</td>
+            </tr>
+            <tr>
+            <td>Italy</td> <td>IT</td>
+            </tr>
+            <tr>
+            <td>Japan</td> <td>JP</td>
+            </tr>
+            <tr>
+            <td>Liechtenstein</td> <td>LI</td>
+            </tr>
+            <tr>
+            <td>Lithuania</td> <td>LT</td>
+            </tr>
+            <tr>
+            <td>Luxembourg</td> <td>LU</td>
+            </tr>
+            <tr>
+            <td>Malaysia</td> <td>MY</td>
+            </tr>
+            <tr>
+            <td>Malta</td> <td>MT</td>
+            </tr>
+            <tr>
+            <td>Monaco</td> <td>MC</td>
+            </tr>
+            <tr>
+            <td>Netherlands</td> <td>NL</td>
+            </tr>
+            <tr>
+            <td>New Zealand</td> <td>NZ</td>
+            </tr>
+            <tr>
+            <td>Norway</td> <td>NO</td>
+            </tr>
+            <tr>
+            <td>Paraguay</td> <td>PY</td>
+            </tr>
+            <tr>
+            <td>Peru</td> <td>PE</td>
+            </tr>
+            <tr>
+            <td>Philippines</td> <td>PH</td>
+            </tr>
+            <tr>
+            <td>Poland</td> <td>PL</td>
+            </tr>
+            <tr>
+            <td>Portugal</td> <td>PT</td>
+            </tr>
+            <tr>
+            <td>Romania</td> <td>RO</td>
+            </tr>
+            <tr>
+            <td>Singapore</td> <td>SG</td>
+            </tr>
+            <tr>
+            <td>Slovakia</td> <td>SK</td>
+            </tr>
+            <tr>
+            <td>Slovenia</td> <td>SI</td>
+            </tr>
+            <tr>
+            <td>South Africa</td> <td>ZA</td>
+            </tr>
+            <tr>
+            <td>South Korea</td> <td>KR</td>
+            </tr>
+            <tr>
+            <td>Spain</td> <td>ES</td>
+            </tr>
+            <tr>
+            <td>Sweden</td> <td>SE</td>
+            </tr>
+            <tr>
+            <td>Switzerland</td> <td>CH</td>
+            </tr>
+            <tr>
+            <td>Thailand</td> <td>TH</td>
+            </tr>
+            <tr>
+            <td>Turkey</td> <td>TR</td>
+            </tr>
+            <tr>
+            <td>United Kingdom</td> <td>GB</td>
+            </tr>
+            <tr>
+            <td>United States</td> <td>US</td>
+            </tr>
+            <tr>
+            <td>Uruguay</td> <td>UY</td>
+            </tr>
+            </tbody>
+         </table>
+
+        ## Checkout Languages
+            CardEye supports the languages listed below.
+            <table>
+              <thead>
+              <tr>
+              <th>Country</th>
+              <th>Default Language</th>
+              <th>Language Code</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+              <td>All native countries</td> <td>English</td><td>en</td>
+              </tr>
+              </tbody>
+            </table>
+
+
+  -  name: Postman Collection
+     description: |
+        Copy this <a href="https://www.postman.com/gold-spaceship-614274/workspace/public/collection/19468165-27159d05-d223-483a-8996-439811922536?action=share&creator=19468165">link</a> and import the collection in postman.
+  -  name: Change Logs
+     description: |
+        Recent changes and additions to CardEye API's are currently being tracked here.
+  - name: Status Codes
+    description: |
+      # Response Status Code
+        <table>
+        <tr>
+        <td><b>Code</b></td>
+        <td><b>Message</b></td>
+        <td><b>HTTP</b></td>
+        </tr>
+        <tr>
+        <td>200</td>
+        <td>Successful Response</td>
+        <td>Yes</td>
+        </tr>
+        <tr>
+        <td>400</td>
+        <td>Bad request, the given data is invalid, or data is required</td>
+        <td>Yes</td>
+        </tr>
+        <tr>
+        <td>401</td>
+        <td>Unauthorised</td>
+        <td>Yes</td>
+        </tr>
+        <tr>
+        <td>403</td>
+        <td>Forbidden</td>
+        <td>Yes</td>
+        </tr>
+        <tr>
+        <td>404</td>
+        <td>Not Found</td>
+        <td>Yes</td>
+        </tr>
+        <td>422</td>
+        <td>Unprocessable content, data is required</td>
+        <td>Yes</td>
+        </tr>
+        <tr>
+        <td>429</td>
+        <td>Too many request attempt</td>
+        <td>Yes</td>
+        </tr>
+        <tr>
+        <td>500</td>
+        <td>Internal server error</td>
+        <td>Yes</td>
+        </tr>
+        </table>
+
+
+      # Declined Reasons
+
+        <p>Given below are the possible declined reasons with codes which will be present in case of a failed payment</p>
+        <p>The declined reason will be presented in the key of <code>"transaction_decline_reason"</code>
+        <p><em><b>Note: To see possible failure codes please <a href="https://docs.google.com/spreadsheets/d/10uQ4wO4aiLk-mF2e7SK71XQmn6Row-9xHnaEX9IzMbc/edit#gid=0" target="_blank">click here</a></em></p>
+
+            {
+              "failure_code": 1,
+              "failure_code_minor": 1,
+              "transaction_id": "string",
+              "transaction_decline_reason": "DECLINE REASON OF TRANSACTION WILL BE HERE",
+              "request_reference": "string",
+            }
+
+x-tagGroups:
+  - name: Resources
+    description:
+    tags:
+      - API Endpoints
+  - name: APPENDICES
+    description:
+    tags:
+      - Currencies & Geographical  locations
+      - Postman Collection
+      - Status Codes
+      - Change Logs
+########################### URLs Paths #######################################
+paths:
+########################### Initiate transaction #############################
+  /api/createTransaction:
+    post:
+      tags:
+        - API Endpoints
+      summary: Hosted Payment Page API
+      description: >-
+        <p>This endpoint is imperative and significant in order to make a complete transaction. It takes necessary data from the merchant, and initiates a transaction for the customer. Also, it takes the authorization key in headers which is aimed for authorization purposes.</p>
+        <p>In response, the endpoint returns a redirect URL, which redirects the customer to the payment page where the customer enters his card details. This redirect URL is a one-time URL, and unique for each transaction. Hence, it is more secure for making transactions.</p>
+      x-codeSamples:
+        - lang: PHP
+          source: |2+
+            <?php
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => '/api/createTransaction',
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => '',
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => 'POST',
+              CURLOPT_POSTFIELDS =>'{
+                "first_name": "Mr. Name",
+                "last_name": "Doe",
+                "email": "abc@gmail.com",
+                "dob":"1997-05-21",
+                "phone_no": "03204337055",
+                "address": "G1",
+                "city": "lahore",
+                "postal_code": 54000,
+                "region": "PB",
+                "ip_address":"192.168.88.62",
+                "country_code": "PK",
+                "fiat_currency": "EUR",
+                "fiat_amount": 10.22,
+                "callback_url": "https://pay.cardeye.com",
+                "redirect_url":"https://pay.cardeye.com",
+                "request_reference": "elfffvffh"
+            }',
+              CURLOPT_HTTPHEADER => array(
+                'Authorization: SjusJqdbUbUjg6a6MMB3t+j7zaDYrnSaaCqG/XX2jQY=',
+                'Accept: application/json',
+                'Content-Type: application/json'
+              ),
+            ));
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+            echo $response;
+
+        - lang: Python
+          source: |-
+            import http.client
+            import json
+
+            conn = http.client.HTTPSConnection("")
+            payload = json.dumps({
+              "first_name": "Mr. Name",
+              "last_name": "Doe",
+              "email": "abc@gmail.com",
+              "dob": "1997-05-21",
+              "phone_no": "03204337055",
+              "address": "G1",
+              "city": "lahore",
+              "postal_code": 54000,
+              "region": "PB",
+              "ip_address": "192.168.88.62",
+              "country_code": "PK",
+              "fiat_currency": "EUR",
+              "fiat_amount": 10.22,
+              "callback_url": "https://pay.cardeye.com",
+              "redirect_url": "https://pay.cardeye.com",
+              "request_reference": "elfffvffh"
+            })
+            headers = {
+              'Authorization': 'SdbUbUjg6a6MMB3t+j7zaDYrnSaaCqG/XX2jQY=',
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+            conn.request("POST", "/api/createTransaction", payload, headers)
+            res = conn.getresponse()
+            data = res.read()
+            print(data.decode("utf-8"))
+
+        - lang: Java
+          source: |+
+            OkHttpClient client = new OkHttpClient().newBuilder()
+              .build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, "{\n    \"first_name\": \"Mr. Name\",\n    \"last_name\": \"Mr. Name\", \n    \"email\": \"abc@gmail.com\",\n    \"dob\":\"1997-05-21\",\n    \"phone_no\": \"03204337055\",\n    \"address\": \"G1\",\n    \"city\": \"lahore\",\n    \"postal_code\": 54000,\n    \"state\": \"PB\",\n    \"ip_address\":\"192.168.88.62\",\n    \"country_code\": \"PK\",\n    \"brand_code\": \"6ZLLC5EOFC8OIM54757UH1MLDZ\",\n    \"fiat_currency\": \"EUR\",\n    \"fiat_amount\": 10.22,\n    \"callback_url\": \"https://pay.cardeye.com\",\n    \"redirect_url\":\"https://pay.cardeye.com\",\n    \"settlement_currency\":\"EUR\",\n    \"request_reference\": \"elfffvffh\"\n}");
+            Request request = new Request.Builder()
+              .url("/api/createTransaction")
+              .method("POST", body)
+              .addHeader("Authorization", "a6MMB3t+j7zaDYrnSaaCqG/XX2jQY=")
+              .addHeader("Accept", "application/json")
+              .addHeader("Content-Type", "application/json")
+              .build();
+            Response response = client.newCall(request).execute();
+
+        - lang: Node
+          source: |+
+            var axios = require('axios');
+            var data = JSON.stringify({
+              "first_name": "Mr. Name",
+              "last_name": "Doe",
+              "email": "abc@gmail.com",
+              "dob": "1997-05-21",
+              "phone_no": "03204337055",
+              "address": "G1",
+              "city": "lahore",
+              "postal_code": 54000,
+              "region": "PB",
+              "ip_address": "192.168.88.62",
+              "country_code": "PK",
+              "fiat_currency": "EUR",
+              "fiat_amount": 10.22,
+              "callback_url": "https://pay.cardeye.com",
+              "redirect_url": "https://pay.cardeye.com",
+              "request_reference": "elfffvffh"
+            });
+
+            var config = {
+              method: 'post',
+              url: '/api/createTransaction',
+              headers: {
+                'Authorization': (Auth Key),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              data : data
+            };
+
+            axios(config)
+            .then(function (response) {
+              console.log(JSON.stringify(response.data));
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+      parameters:
+        - name: Authorization
+          in: header
+          example: P+iBIRT+jC2UanuVUuD+aXQW2tRtijT97oQ5VtrIsW4=
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - first_name
+                - last_name
+                - email
+                - dob
+                - city
+                - address
+                - country_code
+                - fiat_currency
+                - fiat_amount
+                - request_reference
+                - redirect_url
+                - ip_address
+
+              properties:
+                first_name:
+                  type: string
+                  description: First name of customer. The maximum length of the string is 255 characters and the minimum required length is 2 character.
+                  example: John
+                last_name:
+                  type: string
+                  description: Last name of customer. The maximum length of the string is 255 characters and the minimum required length is 2 character.
+                  example: Doe
+                email:
+                  type: string
+                  description: The email address of the user. Maximum length of the string is 255 characters. The email should be in proper format.
+                  example: john@gmail.com
+                dob:
+                  type: string
+                  description: Date of Birth of the customer. The length of the string should be exactly 10 characters long. The date format must be YYYY-MM-DD which is ISO 8601 format. The maximum age allowed is 100 years and the minimum age is 18 years.
+                  format: date
+                  example: "1997-05-21"
+                phone_no:
+                  type: number
+                  description: The phone number of the customer. The maximum length of the string is 16 characters and minimum length is 8 characters.
+                  example: +491xxxxxxxxx
+                address:
+                  type: string
+                  description: Address of the customer. The maximum length of the string is 255 characters and minimum required length is 2 characters
+                city:
+                  type: string
+                  description: City name of the customer. The maximum length of the string is 64 characters and minimum length is 2 characters.
+                  example: Hamburg
+                postal_code:
+                  type: string
+                  description: Postal code of the customer. The maximum length of the string is 100 characters and minimum required length is 2 characters.
+                  example: 20359
+                region:
+                  type: string
+                  description: County / State / Province, in short form where possible
+                ip_address:
+                  type: string
+                  description: Valid format of IPv4 and IPv6.
+                country_code:
+                  type: string
+                  description: The country code of the user. The accepted country codes are listed in the <a href="#section/Supported-Countries">Supported Countries</a> portion of this document. The maximum and minimum length of the string is 2 characters. For example US for United States.
+                  example: DE
+                fiat_currency:
+                  type: string
+                  description: The fiat currency field is to determine the fiat currency type. The supported fiat currencies are listed in the <a href="#section/Supported-Fiat-Currencies">Supported Fiat Currencies</a> portion of this document.
+                  example: EUR
+                fiat_amount:
+                  type: number
+                  description: The amount to be deducted from the customer’s card.
+                  format: double
+                  example: 10
+                callback_url:
+                  type: string
+                  description: URL where callback responses of the transaction have to be sent. Requests sent to this URL will be for the request method POST. Maximum length of the string is 255 characters.
+                  example: https://merchant.callbackURL.com/
+                redirect_url:
+                  type: string
+                  description: URL where the customer will be redirected after a successful or unsuccessful request. Maximum length of the string is 255 characters.
+                      </br> If provided false as value then the customer will not be redirected after a successful or unsuccessful payment.
+                  example: https://merchant.redirectURL.com/
+                request_reference:
+                  type: string
+                  description: A unique identifier for each transaction.
+                    </br>It will be sent back to the merchant on the callback URL to verify that the response is against which transaction. This value should be between 6 to 128 included.
+                payment_method:
+                  type: string
+                  description: The payment method enabled against the Brand.
+                  enum:
+                  - any
+                  - card-payment
+                  - card-payment-ng
+                  - open-banking
+                  - open-banking-123
+                  - card_recurring
+                cpf_number:
+                  type: string
+                  description: The Individual Taxpayer Registration (CPF) is the registry maintained by the Federal Revenue of Brazil. Each registered person is identified in the country by a unique 11-digit number (Make sure region parameter should be the state code consisting of two or three letters.)
+
+                card_recurring:
+                  type: object
+                  description: Its required when payment method is card_recurring.
+                  required:
+                    - interval
+                    - interval_count
+                  properties:
+                    interval:
+                      type: string
+                      description: value must be in day, week, month, year
+                      example: month
+                    interval_count:
+                      type: integer
+                      example: 1
+                      description: the minimum value is 1 and max is 6 in interval count.
+                    end_date:
+                      type: string
+                      example: "2024-09-06"
+                      description: The date must be today or a future date in Y-m-d format
+
+
+
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code:
+                    type: integer
+                    description: Status code of api endpoint returning.
+                    example: 200
+                  message:
+                    type: string
+                    description: message against status code
+                    example: Success
+                  error:
+                    type: boolean
+                    example: false
+                    description: Flag for endpoint gives success or fail response.
+                  data:
+                    type: object
+                    properties:
+                      redirect_url:
+                        type: string
+                        example: https://test-pay.cardeye.com/payment/f82c524a3d62dc578b9cf8f4f4f7a78a552cedbc
+                        description: CardEye self hosted payment URL where merchant redirects their customer for making transactions.
+                      request_reference:
+                        type: string
+                        description: A unique identifier for each transaction provided by merchant in payload.
+
+
+        "400":
+            description: Invalid Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status_code:
+                      type: integer
+                      example: 422
+                    message:
+                      type: string
+                      example: Validation error
+                    error:
+                      type: boolean
+                      example: true
+                    data:
+                      type: string
+                      example: Input validation error
+
+        "422":
+          description: Invalid Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: Validation error
+                  error:
+                    type: boolean
+                    example: true
+                  data:
+                    type: string
+                    example: Input validation error
+        "401":
+            description: unauthorized
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: unauthorized
+
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: Sorry, we're unable to process your request at this moment. Please try again later.
+                  error:
+                    type: boolean
+                    example: true
+                  data:
+                    type: string
+                    example: Server error
+                  # error:
+                  #   type: object
+                  #   properties:
+                    # oneOf:
+                    #   - $ref: '#/components/schemas/public_key'
+                      # - $ref: '#/components/schemas/brand_code'
+
+      callbacks:
+        200:
+          '{$requestBody#/callback_url}':
+            post:
+              summary: Success Callback
+              description: In case if transaction successfully processed.
+              requestBody:
+                description:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                          status:
+                            type: string
+                            example: "ok"
+                          message:
+                            typed: string
+                            example: SUCCESS MESSAGE
+                          api_request_id:
+                            type: integer
+                            example: "API REQUEST ID"
+                          transaction_id:
+                            type: integer
+                            example: "TRANSACTION ID FROM OUR SIDE"
+                          request_reference:
+                            type: string
+                            example: "REQUEST REFERENCE FROM YOUR SIDE"
+                          card_bin:
+                                type: string
+                          card_mask:
+                                type: string
+                          card_holder_name:
+                                type: string
+                          customer_dob:
+                                type: string
+
+
+
+
+        201:
+          '{$requestBody#/callback_url}':
+            post:
+              summary: Failure Callback
+              description: In case if transaction get failed
+              requestBody:
+                description:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        status:
+                              type: string
+                              example: failed
+                        failure_code:
+                              type: integer
+                              example: 10
+                        failure_code_minor:
+                              type: integer
+                              example: 10
+                        transaction_decline_reason:
+                              type: string
+                              example: "TRANSACTION DECLINE REASON"
+                        api_request_id:
+                              type: integer
+                              example: "API REQUEST ID"
+                        transaction_id:
+                              type: integer
+                              example: "TRANSACTION ID FROM OUR SIDE"
+                        request_reference:
+                              type: string
+                              example: "REQUEST REFERENCE FROM YOUR SIDE"
+                        card_bin:
+                              type: string
+                        card_mask:
+                              type: string
+                        card_holder_name:
+                              type: string
+                        customer_dob:
+                              type: string
+
+
+
+  /direct/sales:
+    post:
+        tags:
+          - API Endpoints
+        description: >-
+          <p>Process a sale from a customer to the merchant.</p>
+
+        summary: Server to Server API
+
+        parameters:
+            - name: Authorization
+              in: header
+              example: P+iBIRT+jC2UanuVUuD+aXQW2tRtijT97oQ5VtrIsW4=
+              required: true
+              schema:
+                type: string
+        requestBody:
+          $ref: "#/components/requestBodies/cardEyeRequestSample"
+
+        responses:
+          "200":
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/TransactionResponse"
+
+          "401":
+            description: unauthorized
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: unauthorized
+
+
+          "400":
+            description: Invalid Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status_code:
+                      type: integer
+                      example: 422
+                    message:
+                      type: string
+                      example: Validation error
+                    error:
+                      type: boolean
+                      example: true
+                    data:
+                      type: string
+                      example: Input validation error
+
+          "422":
+            description: Invalid Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status_code:
+                      type: integer
+                      example: 422
+                    message:
+                      type: string
+                      example: Validation error
+                    error:
+                      type: boolean
+                      example: true
+                    data:
+                      type: string
+                      example: Input validation error
+
+          "500":
+            description: Internal error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status_code:
+                      type: integer
+                      example: 500
+                    message:
+                      type: string
+                      example: Sorry, we're unable to process your request at this moment. Please try again later.
+                    error:
+                      type: boolean
+                      example: true
+                    data:
+                      type: string
+                      example: Server error
+
+        callbacks:
+          200:
+            '{$requestBody#/callback_url}':
+              post:
+                summary: Success Callback
+                description: In case if transaction successfully processed.
+                requestBody:
+                  description:
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                            status:
+                              type: string
+                              example: "ok"
+                            message:
+                              typed: string
+                              example: SUCCESS MESSAGE
+                            api_request_id:
+                              type: integer
+                              example: "API REQUEST ID"
+                            transaction_id:
+                              type: string
+                              example: "TRANSACTION ID FROM OUR SIDE"
+                            request_reference:
+                              type: string
+                              example: "REQUEST REFERENCE FROM YOUR SIDE"
+                            card_bin:
+                                type: string
+                            card_mask:
+                                  type: string
+                            card_holder_name:
+                                  type: string
+                            customer_dob:
+                                  type: string
+
+
+
+
+
+          201:
+            '{$requestBody#/callback_url}':
+              post:
+                summary: Failure Callback
+                description: In case if transaction get failed
+                requestBody:
+                  description:
+                  content:
+                    application/json:
+                      schema:
+                        type: object
+                        properties:
+                          status:
+                              type: string
+                              example: failed
+                          failure_code:
+                                type: integer
+                                example: 10
+                          failure_code_minor:
+                                type: integer
+                                example: 10
+                          transaction_decline_reason:
+                                type: string
+                                example: "TRANSACTION DECLINE REASON"
+                          api_request_id:
+                                type: integer
+                                example: "API REQUEST ID"
+                          transaction_id:
+                                type: string
+                                example: "TRANSACTION ID FROM OUR SIDE"
+                          request_reference:
+                                type: string
+                                example: "REQUEST REFERENCE FROM YOUR SIDE"
+                          card_bin:
+                              type: string
+                          card_mask:
+                              type: string
+                          card_holder_name:
+                              type: string
+                          customer_dob:
+                              type: string
+
+
+
+
+  /api/transaction-status:
+    get:
+        tags:
+          - API Endpoints
+        description: >-
+          <p>Retrieve information about a transaction, such as a previously-posted on both APIs.</p>
+
+        summary: Get Transaction Status
+
+
+        parameters:
+            - name: Authorization
+              in: header
+              example: P+iBIRT+jC2UanuVUuD+aXQW2tRtijT97oQ5VtrIsW4=
+              required: true
+              schema:
+                type: string
+            - name: transaction_id
+              in: query
+              example: 12324231231123
+              description: ID of transaction received on callback endpoint provided on during requesting API.
+              required: true
+              schema:
+                type: string
+
+        responses:
+          "200":
+            description: Success
+            content:
+              application/json:
+                schema:
+                   $ref: "#/components/schemas/TransactionResponseStatus"
+
+          "401":
+            description: unauthorized
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: unauthorized
+
+
+          "400":
+            description: Invalid Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status_code:
+                      type: integer
+                      example: 422
+                    message:
+                      type: string
+                      example: Validation error
+                    error:
+                      type: boolean
+                      example: true
+                    data:
+                      type: string
+                      example: Input validation error
+
+          "422":
+            description: Invalid Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status_code:
+                      type: integer
+                      example: 422
+                    message:
+                      type: string
+                      example: Validation error
+                    error:
+                      type: boolean
+                      example: true
+                    data:
+                      type: string
+                      example: Input validation error
+
+          "500":
+            description: Internal error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status_code:
+                      type: integer
+                      example: 500
+                    message:
+                      type: string
+                      example: Sorry, we're unable to process your request at this moment. Please try again later.
+                    error:
+                      type: boolean
+                      example: true
+                    data:
+                      type: string
+                      example: Server error
+
+
+  /api/list-transactions:
+    get:
+        tags:
+          - API Endpoints
+        description: >-
+          <p>List all transactions of organization</p>
+
+        summary: List Transactions
+
+        parameters:
+            - name: Authorization
+              in: header
+              example: P+iBIRT+jC2UanuVUuD+aXQW2tRtijT97oQ5VtrIsW4=
+              required: true
+              schema:
+                type: string
+
+            - name: from
+              in: query
+              example: "2020-01-01 08:44:34"
+              schema:
+                type: string
+
+            - name: to
+              in: query
+              example: "2020-01-01 08:44:34"
+              schema:
+                type: string
+
+            - name: transaction_id
+              in: query
+              schema:
+                type: string
+                description: To get single transaction detail
+        responses:
+          "200":
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/TransactionDetailResponse"
+
+          "401":
+            description: unauthorized
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: unauthorized
+
+          "422":
+            description: Invalid Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status_code:
+                      type: integer
+                      example: 422
+                    message:
+                      type: string
+                      example: Validation error
+                    error:
+                      type: boolean
+                      example: true
+                    data:
+                      type: string
+                      example: Input validation error
+
+          "500":
+            description: Internal error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status_code:
+                      type: integer
+                      example: 500
+                    message:
+                      type: string
+                      example: Sorry, we're unable to process your request at this moment. Please try again later.
+                    error:
+                      type: boolean
+                      example: true
+                    data:
+                      type: string
+                      example: Server error
+
+
+  /api/refund:
+      post:
+          tags:
+            - API Endpoints
+          description: >-
+            <p>To create refund request through API. The refund only happened if support team approved this request</p>
+
+          summary: Refund Transaction
+
+          parameters:
+              - name: Authorization
+                in: header
+                example: P+iBIRT+jC2UanuVUuD+aXQW2tRtijT97oQ5VtrIsW4=
+                required: true
+                schema:
+                  type: string
+
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - transaction_id
+
+                  properties:
+                    transaction_id:
+                      description: ID of transaction received on callback endpoint provided on during requesting API.
+                      type: string
+                      example: string
+                    callback_url:
+                      type: string
+                      description: URL where callback responses of the refund transaction have to be sent. Requests sent to this URL will be for the request method POST. Maximum length of the string is 255 characters.
+          responses:
+            "200":
+              description: Success
+              content:
+                application/json:
+                  schema:
+                    $ref: "#/components/schemas/RefundResponse"
+
+            "401":
+              description: unauthorized
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: unauthorized
+
+            "400":
+              description: Invalid Request
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status_code:
+                        type: integer
+                        example: 400
+                      message:
+                        type: string
+
+            "500":
+              description: Internal Server error
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Server Error
+          callbacks:
+            200:
+              '{$requestBody#/callback_url}':
+                post:
+                  summary: Refund Callback
+                  description: In case if transaction refunded successfully processed.
+                  requestBody:
+                    description:
+                    content:
+                      application/json:
+                        schema:
+                          type: object
+                          properties:
+                              status:
+                                type: string
+                                example: "refunded"
+                              message:
+                                typed: string
+                                example: SUCCESS MESSAGE
+                              api_request_id:
+                                type: integer
+                                example: "API REQUEST ID"
+                              transaction_id:
+                                type: string
+                                example: "TRANSACTION ID FROM OUR SIDE"
+                              request_reference:
+                                type: string
+                                example: "REQUEST REFERENCE FROM YOUR SIDE"
+                              card_bin:
+                                  type: string
+                              card_mask:
+                                    type: string
+                              card_holder_name:
+                                    type: string
+                              customer_dob:
+                                    type: string
+
+  /api/manage-cards:
+      post:
+          tags:
+            - API Endpoints
+          description: >-
+            <p>This endpoint allows users to add and manage their payment cards for recurring payments. Through this endpoint, users can securely save their card details for managing recurring payment methods or delete card.</p>
+
+          summary: Manage Cards
+
+          parameters:
+              - name: Authorization
+                in: header
+                example: P+iBIRT+jC2UanuVUuD+aXQW2tRtijT97oQ5VtrIsW4=
+                required: true
+                schema:
+                  type: string
+
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - email
+                    - redirect_url
+
+                  properties:
+                    email:
+                      type: string
+                      description: The email address of the user. Maximum length of the string is 255 characters. The email should be in proper format.
+                      example: john@gmail.com
+                    redirect_url:
+                      type: string
+                      description: URL where the customer will be redirected after a successful or unsuccessful request. Maximum length of the string is 255 characters.
+
+          responses:
+            "200":
+              description: Success
+              content:
+                application/json:
+                  schema:
+                    $ref: "#/components/schemas/ManageCardResponse"
+
+            "401":
+              description: unauthorized
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: unauthorized
+
+            "400":
+              description: Invalid Request
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status_code:
+                        type: integer
+                        example: 400
+                      message:
+                        type: string
+
+
+            "422":
+              description: Invalid Request
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status_code:
+                        type: integer
+                        example: 422
+                      message:
+                        type: string
+                        example: Validation error
+                      error:
+                        type: boolean
+                        example: true
+                      data:
+                        type: string
+                        example: Input validation error
+
+
+
+            "500":
+              description: Internal Server error
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Server Error
+
+  /api/cancel-recurring-payment:
+      post:
+          tags:
+            - API Endpoints
+          description: >-
+            <p>This endpoint enables users to cancel their recurring payment. By providing the necessary recurring details, users can terminate their recurring payment plans. This endpoint ensures that users have control over their recurring services and can easily discontinue payments as needed.</p>
+
+          summary: Cancel Recurring Payment
+
+          parameters:
+              - name: Authorization
+                in: header
+                example: P+iBIRT+jC2UanuVUuD+aXQW2tRtijT97oQ5VtrIsW4=
+                required: true
+                schema:
+                  type: string
+
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - transaction_id
+                  properties:
+                    transaction_id:
+                      type: string
+                      description: Initial transaction ID for making recurring request
+          responses:
+            "200":
+              description: Success
+              content:
+                application/json:
+                  schema:
+                    $ref: "#/components/schemas/RecurringResponse"
+
+            "401":
+              description: unauthorized
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: unauthorized
+
+            "400":
+              description: Invalid Request
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status_code:
+                        type: integer
+                        example: 400
+                      message:
+                        type: string
+
+            "422":
+              description: Invalid Request
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status_code:
+                        type: integer
+                        example: 422
+                      message:
+                        type: string
+                        example: Validation error
+                      error:
+                        type: boolean
+                        example: true
+                      data:
+                        type: string
+                        example: Input validation error
+
+
+
+            "500":
+              description: Internal Server error
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Server Error
+
+
+
+###################################### Components ########################################
+components:
+  ######################## Schemas #################################
+  requestBodies:
+    cardEyeRequestSample:
+      content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - card
+                - card_holder
+                - order
+                - device
+                - customer
+              properties:
+                card:
+                  type: object
+                  description: Card details being used for this direct sale request
+                  allOf:
+                    - $ref: '#/components/schemas/cardOBJ'
+                card_holder:
+                  type: object
+                  description: Card holder details of the card used in this request
+                  allOf:
+                    - $ref: '#/components/schemas/cardholderOBJ'
+                order:
+                  type: object
+                  description: Order details
+                  allOf:
+                    - $ref: '#/components/schemas/order'
+                customer:
+                  type: object
+                  description: Information about the customer
+                  allOf:
+                    - $ref: '#/components/schemas/customer'
+                device:
+                  type: object
+                  description: Device details of the customer's machine making the request
+                  allOf:
+                    - $ref: '#/components/schemas/device'
+                callback_url:
+                  type: string
+                  description: If provided, transaction status will be sent here as HTTP post in addition to being returned as reply value. Maximum length of the string is 255 characters.
+                customer_destination_url:
+                  type: string
+                  description: If a transaction requires customer verification, such as 3DS (indicated in the reply via status cust_verification_required), and the customer is navigated away from the merchant website or application by such type of verification, this URL optionally indicates the destination that the customer should be landed to post-verification. This is usually an order confirmation or receipt of payment page. If omitted, the customer will be routed to the HTTP Referer by default.
+                      </br> If provided false as value then the customer will not be redirected after a successful or unsuccessful payment.
+                payment_method:
+                  type: string
+                  description: The payment method enabled against the Brand.
+                  enum:
+                    - card-payment-ng
+
+  schemas:
+    cardOBJ:
+      type: object
+      required:
+        - expiry
+        - pan
+        - cvv
+        - name_on_card
+      properties:
+        expiry:
+          type: object
+          description: Expiry year and month
+          required:
+            - year
+            - month
+          properties:
+            year:
+              type: integer
+              description: Year in two digits, assumed to be in the future
+            month:
+              type: integer
+              description: A value between 1 and 12. Expiry month should be greater or equal to the current month.
+        pan:
+          type: string
+          description: Primary Account Number (card number)
+        cvv:
+          type: string
+          description: Card security code
+        name_on_card:
+          type: string
+          description: Name embossed on card
+
+    cardholderOBJ:
+      type: object
+      required:
+        - expiry
+        - pan
+        - cvv
+        - name_on_card
+        - date_of_birth
+        - name
+        - contact
+        - billing_address
+      properties:
+        name:
+          type: object
+          description: Customer name object
+          required:
+            - first
+            - last
+          properties:
+            first:
+              type: string
+              description: First name
+            middle:
+              type: string
+              description: Middle name(s)
+            last:
+              type: string
+              description: Last name
+            prefix:
+              type: string
+              description: Prefix / Title
+            suffix:
+              type: string
+              description: Suffix
+        date_of_birth:
+          type: string
+          description: Date of birth as ISO yyyy-mm-dd
+        gender:
+          type: string
+          description: Gender
+          enum:
+            - male
+            - female
+            - other
+        contact:
+          type: object
+          description: Email and phone details
+          required:
+            - email
+          properties:
+            email:
+              type: string
+              description: Valid email format
+            phone:
+              type: string
+              description: Phone number
+        billing_address:
+          name:
+          type: object
+          required:
+            - line1
+            - city
+            - country
+          properties:
+            line1:
+              type: string
+              description: Address Line 1
+            line2:
+              type: string
+              description: Address Line 2
+            city:
+              type: string
+              description: City or town name
+            postal_code:
+              type: string
+              description: Postal code of the customer. The maximum length of the string is 100 characters and minimum required length is 2 characters.
+            region:
+              type: string
+              description: County / State / Province, in short form where possible
+            country:
+              type: string
+              description: Country (2-letter code)
+
+
+
+    order:
+      type: object
+      required:
+        - total
+        - ref
+      properties:
+        total:
+          name:
+          type: object
+          description: Total amount that will be charged to the payment card
+          required:
+            - amount
+            - currency
+          properties:
+            amount:
+              type: number
+              description: Amount, using decimals for cents
+            currency:
+              type: string
+              description: ISO 4217 Currency Code, 3-chars
+        ref:
+          type: string
+          description: Merchant's unique reference to the sale request.
+        mid:
+          type: string
+          description: Merchant ID for accounting with max length of 256 characters.
+        invoice:
+          type: object
+          description: Information about an invoice issued by the merchant to the customer for this order
+          properties:
+            ref:
+              type: string
+              description: Merchant's reference / identifier for an invoice
+            date:
+              type: string
+              description: Date on which invoice was issued to customer, in ISO yyyy-mm-dd format
+
+    customer:
+      type: object
+      description: Information about the customer of the sale
+      required:
+        - ref
+      properties:
+        ref:
+          type: string
+          description: Merchant's unique reference / id to this customer
+        bank_id:
+          type: string
+          description: the format should be (YY)YYMMDDXXXX
+        kyc:
+          type: object
+          description: Add kyc details of customer
+          properties:
+            is_kyc:
+              type: boolean
+              description: customer kyc is done or not at your end
+            source:
+              type: string
+              description: source of kyc
+            email:
+              type: string
+              description: email of customer who already been verified
+            date_of_birth:
+              type: string
+              description: date of birth of customer who already been verified
+            full_name:
+              type: string
+              description: full name of customer who already been verified
+            device:
+              type: object
+              properties:
+                ip:
+                  type: string
+                  description: customer ip who already been verified
+
+
+    device:
+      type: object
+      required:
+        - ip
+      properties:
+        ip:
+          type: string
+          description: IP address of customer device from which sale originated. Usually IP4, but IP6 also supported.
+        http_headers:
+          name:
+          type: object
+          description: Certain HTTP headers, as received from customer user-agent from which sale originated
+          properties:
+            accept:
+              type: string
+              description: Accept header
+            accept_language:
+              type: string
+              description: Accept Language Header
+            user_agent:
+              type: string
+              description: User agent of the browser
+
+    TransactionResponse:
+            type: object
+            required:
+             - status
+             - at
+            properties:
+              status:
+                type: string
+                description: Current status of the transaction. ok = complete and successful. pending = Waiting for upstream PSP. failed = complete and unsuccessful, see failure_codes for details. cust_verification_required = Customer needs to visit link or interact with provided HTML fragment, see cust_verification_required object.
+                enum:
+                  - ok
+                  - pending
+                  - failed
+                  - cust_verification_required
+                example: ok
+              at:
+                type: string
+                description: Timestamp of transaction creation
+                example: "2022-07-28T12:22:32.000000Z"
+              transaction_id:
+                type: string
+                description: ID for transaction identification
+              order_ref:
+                type: string
+                description: order reference
+              failure_code:
+                type: string
+                description: If status is failed, failure code (major) classifies the reason for the failure
+              failure_code_minor:
+                type: string
+                description: If status is failed, failure code (minor) classifies the reason for the failure coming from upstream
+              total_requested:
+                type: object
+                description: Sale total, as requested
+                properties:
+                  amount:
+                    type: number
+                  currency:
+                    type: string
+              score:
+                type: object
+                description: If present, provides details of how the sale was scored against incoming scoring rules
+                properties:
+                  grade:
+                    type: any
+                    description: Rating of payment request's score fail, requires_review, pass_good or pass_excellent
+                    example: pass
+                  result:
+                    type: integer
+                    description: Payment's score
+                    example: 450
+                  max:
+                    type: integer
+                    description: Maximum possible score for this payment
+                    example: 1000
+                  categories:
+                    type: array
+                    description: A summary of the most prominent per-category factors from which the score was determined.
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                          description: Key for this category
+                          example: Card
+                        adj:
+                          type: integer
+                          description: How this category contributed to the score (adjustment)
+
+              cust_verification_required:
+                type: object
+                description: When status is cust_verification_required, this field provides details about the verification that the merchant must ask the customer to perform - such as rendering a fragment of HTML to the customer, or directing the customer towards a link that the customer must visit.
+                properties:
+                  render_html:
+                    type: string
+                    description: 	If present, this chunk of HTML must be rendered to the customer. It will often be a web form and/or JavaScript fragment, which may navigate the customer away from the containing page to perform e.g. 3D Secure processing. If customer_destination_url was set in the payment request, and this HTML fragment routes the customer away from the containing page, the customer will be routed there afterwards. <p>Note:</p> The HTML is naturally represented, correctly escaped as a JSON string, and not Base64 or similarly encoded.
+                  timeout:
+                    type: string
+                    description: If present, indicates the timeout before which the customer must perform verification, otherwise the transaction will be considered abandoned and change to a status of failed. In ISO 8601 Date+Time format.
+
+    TransactionDetailResponse:
+            type: object
+            required:
+             - status_code
+             - message
+             - error
+             - data
+            properties:
+              status_code:
+                type: string
+              message:
+                type: string
+              error:
+                type: boolean
+              data:
+                type: object
+                properties:
+                  count:
+                    type: string
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        transaction_id:
+                          type: string
+                        failure_code:
+                          type: number
+                        failure_code_minor:
+                          type: number
+                        status:
+                          type: string
+                          description: Current status of the transaction. ok = complete and successful. pending = Waiting for upstream PSP. failed = complete and unsuccessful, see failure_codes for details. cust_verification_required = Customer needs to visit link or interact with provided HTML fragment, see cust_verification_required object.
+                          enum:
+                            - ok
+                            - pending
+                            - failed
+                            - cust_verification_required
+                            - refunded
+                          example: ok
+                        order_reference:
+                          type: string
+                        total_requested:
+                          type: object
+                          properties:
+                            amount:
+                              type: number
+                            currency:
+                              type: string
+                        total_settled:
+                          type: object
+                          description: Settled amount is shown 0 when transaction status is not 'ok'.
+                          properties:
+                            amount:
+                              type: number
+                            currency:
+                              type: string
+                        card_bin:
+                          type: number
+                        brand_id:
+                          type: string
+                        brand_name:
+                          type: string
+                        psp_id:
+                          type: string
+                        psp_name:
+                          type: string
+                        psp_transaction_id:
+                          type: string
+                        psp_mid:
+                          type: string
+                        psp_mid_name:
+                          type: string
+                        country:
+                          type: string
+                        country_code:
+                          type: string
+                        refund_tranx_id:
+                          type: string
+                        cp_mid:
+                          type: string
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+
+    RefundResponse:
+        type: object
+        required:
+          - status_code
+          - message
+        properties:
+          status_code:
+            type: string
+            example: 200
+            description: status code is 200
+          message:
+            type: string
+            example: Refund Request has been generated
+            description: Refund Request has been generated
+
+    ManageCardResponse:
+        type: object
+        required:
+          - status_code
+          - message
+          - error
+        properties:
+          status_code:
+            type: string
+            example: 200
+            description: status code is 200
+          message:
+            type: string
+            example: Manage Card Request has been generated
+            description: Manage Card Request has been generated
+          error:
+            type: boolean
+            example: false
+            description: Flag for endpoint gives success or fail response.
+          data:
+            type: object
+            properties:
+              redirect_url:
+                type: string
+                example: https://pay.cardeye.com/manage-cards/64080da8d7a4faccafec9fbd415d5542661f0f34
+                description: CardEye self hosted payment URL where merchant redirects their customer to manage their card.
+
+
+
+    RecurringResponse:
+        type: object
+        required:
+          - status_code
+          - message
+          - error
+        properties:
+          status_code:
+            type: string
+            example: 200
+            description: status code is 200
+          message:
+            type: string
+            example: Success
+            description: Success
+          error:
+            type: boolean
+            example: false
+            description: Flag for endpoint gives success or fail response.
+          data:
+            type: string
+            example: Recurring Payment Cancelled Successfully!
+
+    TransactionResponseStatus:
+            type: object
+            required:
+             - status
+             - at
+            properties:
+              status:
+                type: string
+                description: Current status of the transaction. ok = complete and successful. pending = Waiting for upstream PSP. failed = complete and unsuccessful, see failure_codes for details. cust_verification_required = Customer needs to visit link or interact with provided HTML fragment, see cust_verification_required object.
+                enum:
+                  - ok
+                  - pending
+                  - failed
+                  - cust_verification_required
+                example: ok
+              at:
+                type: string
+                description: Timestamp of transaction creation
+                example: "2022-07-28T12:22:32.000000Z"
+              transaction_id:
+                type: string
+                description: ID for transaction identification
+              order_ref:
+                type: string
+                description: order reference
+              failure_code:
+                type: string
+                description: If status is failed, failure code (major) classifies the reason for the failure
+              failure_code_minor:
+                type: string
+                description: If status is failed, failure code (minor) classifies the reason for the failure coming from upstream
+              total_requested:
+                type: object
+                description: Sale total, as requested
+                properties:
+                  amount:
+                    type: number
+                  currency:
+                    type: string
+              card_bin:
+                type: string
+              card_mask:
+                type: string
+              card_holder_name:
+                type: string
+              customer_dob:
+                type: string
+              score:
+                type: object
+                description: If present, provides details of how the sale was scored against incoming scoring rules
+                properties:
+                  grade:
+                    type: any
+                    description: Rating of payment request's score fail, requires_review, pass_good or pass_excellent
+                    example: pass
+                  result:
+                    type: integer
+                    description: Payment's score
+                    example: 450
+                  max:
+                    type: integer
+                    description: Maximum possible score for this payment
+                    example: 1000
+                  categories:
+                    type: array
+                    description: A summary of the most prominent per-category factors from which the score was determined.
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                          description: Key for this category
+                          example: Card
+                        adj:
+                          type: integer
+                          description: How this category contributed to the score (adjustment)
+
+              cust_verification_required:
+                type: object
+                description: When status is cust_verification_required, this field provides details about the verification that the merchant must ask the customer to perform - such as rendering a fragment of HTML to the customer, or directing the customer towards a link that the customer must visit.
+                properties:
+                  render_html:
+                    type: string
+                    description: 	If present, this chunk of HTML must be rendered to the customer. It will often be a web form and/or JavaScript fragment, which may navigate the customer away from the containing page to perform e.g. 3D Secure processing. If customer_destination_url was set in the payment request, and this HTML fragment routes the customer away from the containing page, the customer will be routed there afterwards. <p>Note:</p> The HTML is naturally represented, correctly escaped as a JSON string, and not Base64 or similarly encoded.
+                  timeout:
+                    type: string
+                    description: If present, indicates the timeout before which the customer must perform verification, otherwise the transaction will be considered abandoned and change to a status of failed. In ISO 8601 Date+Time format.
+
+
+
+
+
+
+
+################################### Server URL #####################################
+servers:
+  - url: https://staging-pay.cardeye.com
+    description: Staging server
+  - url: https://pay.cardeye.com
+    description: Production server

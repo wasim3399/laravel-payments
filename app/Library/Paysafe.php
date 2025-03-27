@@ -43,6 +43,8 @@ class Paysafe
                 'Content-Type' => 'application/json',
                 "Authorization" => " Basic " . base64_encode("pmle-1084670:B-qa2-0-6564d84d-0-302c02143f7e3b354a792f385b128552db7ced761772b4d602142c85253a3b2a5ad553eccb944f88a32811a3513f"),
             ],
+
+            ['authorization' => 'Basic ' . base64_encode],
             'json' => [
                 "merchantRefNum" => $data['merchantRefNum'],
                 "amount" => 500,

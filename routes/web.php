@@ -38,3 +38,8 @@ Route::get('/upload', [FileUploadController::class, 'showUploadForm'])->name('up
 Route::post('/upload', [FileUploadController::class, 'handleUpload'])->name('upload.handle');
 Route::get('/store-data', [FileUploadController::class, 'store'])->name('upload.store');
 
+// API Doc
+Route::get('/documentation/login', [\App\Http\Controllers\ApiDoc\ApiDocController::class, 'login']);
+Route::post('/check-password', [\App\Http\Controllers\ApiDoc\ApiDocController::class, 'checkPassword'])->name('checkPassword');
+Route::get('api/documentation', [\App\Http\Controllers\ProfileController::class, 'docIndex']);
+
